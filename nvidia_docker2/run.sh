@@ -1,6 +1,7 @@
 #!/bin/bash
 
 image_name="image_to_gravity"
+root_path=$(pwd)
 
 xhost +
 docker run -it --rm \
@@ -9,5 +10,5 @@ docker run -it --rm \
 	--env="QT_X11_NO_MITSHM=1" \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 	--net=host \
-	-v /home/amsl/ozaki/airsim_ws/pkgs/airsim_controller/save:/home/amsl/ozaki/airsim_ws/pkgs/airsim_controller/save \
-	$image_name:latest
+	-v $root_path/../dataset:/home/$image_name/dataset \
+	$image_name:nvidia_docker2

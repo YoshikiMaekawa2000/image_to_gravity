@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.2-devel-ubuntu18.04
+FROM nvidia/cuda:10.0-devel-ubuntu18.04
 
 ########## nvidia-docker1 hooks ##########
 LABEL com.nvidia.volumes.needed="nvidia_driver"
@@ -21,8 +21,10 @@ RUN apt-get update &&\
 		matplotlib \
 		torch==1.0.1 torchvision==0.2.2 \
 		tensorboardX
+######### NO cache ##########
+ARG CACHEBUST=1
 ######### My package ##########
 RUN cd /home &&\
-	git clone https://github.com/ozakiryota/test_pytorch
+	git clone https://github.com/ozakiryota/image_to_gravity
 ######### initial position ##########
 WORKDIR /home
