@@ -1,5 +1,6 @@
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import time
 
 import torch
 from torchvision import models
@@ -147,5 +148,7 @@ optimizer = optim.SGD([
 print(optimizer)
 
 ## execution
-num_epochs = 200
+num_epochs = 100
+start_clock = time.time()
 train_model(net, dataloaders_dict, criterion, optimizer, num_epochs=num_epochs)
+print ("training_time: ", time.time() - start_clock, " [sec]")
