@@ -1,4 +1,6 @@
 dataset
-weights/*.pth
+weights/*
 runs
-graph/*.jpg
+graph/*
+
+!.gitkeep
