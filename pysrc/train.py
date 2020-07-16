@@ -151,4 +151,7 @@ print(optimizer)
 num_epochs = 100
 start_clock = time.time()
 train_model(net, dataloaders_dict, criterion, optimizer, num_epochs=num_epochs)
-print ("training_time: ", time.time() - start_clock, " [sec]")
+## training time
+mins = (time.time() - start_clock) // 60
+secs = (time.time() - start_clock) % 60
+print ("training_time: ", mins, " [min] ", secs, " [sec]")
