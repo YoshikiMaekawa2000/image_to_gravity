@@ -26,4 +26,4 @@ ARG CACHEBUST=1
 RUN cd /home &&\
 	git clone https://github.com/ozakiryota/image_to_gravity
 ######### initial position ##########
-WORKDIR /home
+WORKDIR /home/image_to_gravity
