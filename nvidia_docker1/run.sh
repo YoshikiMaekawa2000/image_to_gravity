@@ -10,4 +10,6 @@ nvidia-docker run -it --rm \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 	--net=host \
 	-v $root_path/../dataset:/home/$image_name/dataset \
+	-v $root_path/../weights:/home/$image_name/weights \
+	-v $root_path/../graph:/home/$image_name/graph \
 	$image_name:nvidia_docker1
