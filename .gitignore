@@ -1,4 +1,4 @@
 dataset
-weights
+weights/*.pth
 runs
-graph
+graph/*.jpg
