@@ -13,5 +13,4 @@ docker run -it --rm \
 	-v $root_path/../dataset:/home/$image_name/dataset \
 	-v $root_path/../weights:/home/$image_name/weights \
 	-v $root_path/../graph:/home/$image_name/graph \
-	-v $root_path/../mle:/home/$image_name/mle \
 	$image_name:nvidia_docker2
