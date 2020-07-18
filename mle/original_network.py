@@ -57,7 +57,8 @@ class OriginalNet(nn.Module):
         # print("fc-in", x.size())
         x = self.fc(x)
         # print("fc-out", x.size())
-        x[:, :3] = nn.functional.normalize(x[:, :3], p=2, dim=1)    #L2Norm, |(gx, gy, gz)| = 1
+        l2norm = torch.norm(x[:, :3].clone(), p=2, dim=1, keepdim=True)
+        x[:, :3] = torch.div(x[:, :3].clone(), l2norm)  #L2Norm, |(gx, gy, gz)| = 1
         x[:, 3:6] = torch.exp(x[:, 3:6])    #(sx, sy, sz) > 0
         x[:, 6:9] = torch.tanh(x[:, 6:9])   #1 > (corr_xy, corr_yz, corr_zx) > -1
         # print("x[:, :3] = ", x[:, :3])
@@ -75,7 +76,7 @@ class OriginalNet(nn.Module):
 # image_file_path = "../dataset/example.jpg"
 # img = Image.open(image_file_path)
 # ## label
-# g_list = [0, 0, 1]
+# g_list = [0, 0, 9.81]
 # acc = np.array(g_list)
 # ## trans param
 # size = 224  #VGG16

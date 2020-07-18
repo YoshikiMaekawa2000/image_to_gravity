@@ -18,8 +18,9 @@ RUN apt-get update &&\
 	pip3 install \
 		tqdm \
 		matplotlib \
-		torch==1.0.1 torchvision==0.2.2 \
-		tensorboardX
+		tensorboardX \
+		# torch==1.0.1 torchvision==0.2.2
+		torch==1.2.0 torchvision==0.4.0
 ######### NO cache ##########
 ARG CACHEBUST=1
 ######### My package ##########

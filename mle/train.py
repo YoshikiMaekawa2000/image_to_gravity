@@ -12,8 +12,9 @@ import make_datapath_list
 import data_transform
 import original_dataset
 import original_network
+import original_criterion
 
-def train_model(net, dataloaders_dict, criterion, optimizer, num_epochs):
+def train_model(net, dataloaders_dict, optimizer, num_epochs):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("device = ", device)
 
@@ -49,9 +50,7 @@ def train_model(net, dataloaders_dict, criterion, optimizer, num_epochs):
                 with torch.set_grad_enabled(phase == "train"):  #compute grad only in "train"
                     ## forward
                     outputs = net(inputs)
-                    print("outputs.size() = ", outputs.size())
-                    print("labels.size() = ", labels.size())
-                    loss = criterion(outputs, labels)
+                    loss = original_criterion.originalCriterion(outputs, labels)
 
                     ## backward
                     if phase == "train":
@@ -122,16 +121,13 @@ val_dataset = original_dataset.OriginalDataset(
 )
 
 ## dataloader
-batch_size = 100
+batch_size = 50
 print("batch_size = ", batch_size)
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 dataloaders_dict = {"train": train_dataloader, "val": val_dataloader}
 print("train data: ", len(dataloaders_dict["train"].dataset))
 print("val data: ", len(dataloaders_dict["val"].dataset))
-
-## criterion
-criterion = nn.MSELoss()
 
 ## network
 net = original_network.OriginalNet()
@@ -153,7 +149,7 @@ print(optimizer)
 ## execution
 num_epochs = 100
 start_clock = time.time()
-train_model(net, dataloaders_dict, criterion, optimizer, num_epochs=num_epochs)
+train_model(net, dataloaders_dict, optimizer, num_epochs=num_epochs)
 ## training time
 mins = (time.time() - start_clock) // 60
 secs = (time.time() - start_clock) % 60
