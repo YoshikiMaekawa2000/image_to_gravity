@@ -121,6 +121,7 @@ val_dataset = original_dataset.OriginalDataset(
 
 ## dataloader
 batch_size = 100
+print("batch_size = ", batch_size)
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 dataloaders_dict = {"train": train_dataloader, "val": val_dataloader}
