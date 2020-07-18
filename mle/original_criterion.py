@@ -26,6 +26,7 @@ def getCov(x):
     return cov
 
 def originalCriterion(outputs, labels):
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     k = labels.size(1)
     g = outputs[:, :3].clone()
     cov = getCov(outputs)
@@ -45,9 +46,11 @@ def originalCriterion(outputs, labels):
     print("cov[0] = ", cov[0])
     print("cov_inv[0] = ", cov_inv[0])
 
+    cov_inv = cov_inv.to(device)
     numerator = torch.exp(-1 / 2 * torch.bmm(torch.bmm(diff, cov_inv), diff_trans))
-    denominator = torch.sqrt(((2*math.pi)**k) * torch.det(cov)) #det() works in torch>1.2.0
     numerator = numerator.clone().squeeze_()
+    denominator = torch.sqrt(((2*math.pi)**k) * torch.det(cov)) #det() works in torch>1.2.0
+    denominator = denominator.to(device)
     # print("denominator.size() = ", denominator.size())
     # print("denominator = ", denominator)
     # print("numerator.size() = ", numerator.size())
