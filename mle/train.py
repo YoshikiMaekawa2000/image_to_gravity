@@ -54,6 +54,7 @@ def train_model(net, dataloaders_dict, optimizer, num_epochs):
 
                     ## backward
                     if phase == "train":
+                        torch.autograd.set_detect_anomaly(True)
                         loss.backward()     #accumulate gradient to each Tensor
                         optimizer.step()    #update param depending on current .grad
 
