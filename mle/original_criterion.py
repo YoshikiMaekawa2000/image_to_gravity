@@ -5,8 +5,11 @@ import torch
 
 def getCov(x):
     sigma = x[:, 3:6].clone()
+    print("sigma[:, 0] = ", sigma[:, 0])
     corr = x[:, 6:9].clone()
+    print("corr[0] = ", corr[0])
     sxx = sigma[:, 0] * sigma[:, 0]
+    print("sxx = ", sxx)
     syy = sigma[:, 1] * sigma[:, 1]
     szz = sigma[:, 2] * sigma[:, 2]
     sxy = corr[:, 0] * sigma[:, 0] * sigma[:, 1]
@@ -67,9 +70,15 @@ def originalCriterion(outputs, labels):
     loss = torch.sum(loss) / loss.size(0)
 
     for i in range(cov.size(0)):
-        print("cov[", i, "] = ", cov[i])
+        if torch.isnan(denominator[i]).any():
+            print("!!!!!!!!!!!!!!!!!!!!!!!")
+            print("torch.isnan(denominator[i]).any() = ", torch.isnan(denominator[i]).any())
+            print("outputs[i] = ", outputs[i])
+            print("cov[i] = ", cov[i])
+            print("cov_det[i] = ", cov_det[i])
     print("torch.isnan(outputs).any() = ", torch.isnan(outputs).any())
     print("torch.isnan(cov).any() = ", torch.isnan(cov).any())
+    print("cov_det = ", cov_det)
     print("((2*math.pi)**k) * cov_det = ", ((2*math.pi)**k) * cov_det)
     print("denominator = ", denominator)
     print("torch.isnan(((2*math.pi)**k) * cov_det).any() = ", torch.isnan(((2*math.pi)**k) * cov_det).any())
