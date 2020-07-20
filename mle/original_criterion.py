@@ -18,6 +18,7 @@ def originalCriterion(outputs, labels, device):
     mu = outputs[:, :3]
     L = getTriangularMatrix(outputs)
     L = L.to(device)
+    LL = getCovMatrix(outputs)
     # Ltrans = torch.transpose(L, 1, 2)
     # Ltrans = Ltrans.to(device)
     # LL = torch.bmm(L, Ltrans)
@@ -28,6 +29,12 @@ def originalCriterion(outputs, labels, device):
 
     dist = torch.distributions.MultivariateNormal(mu, scale_tril=L)
     loss = -dist.log_prob(labels)
+    for i in range(loss.size(0)):
+        if torch.isnan(loss[i]):
+            print("torch.isnan(loss[i]) = ", torch.isnan(loss[i]))
+            print("outputs[i] = ", outputs[i])
+            print("L[i] = ", L[i])
+            print("LL[i] = ", LL[i])
     loss = loss.mean()
     # print("loss = ", loss)
 
