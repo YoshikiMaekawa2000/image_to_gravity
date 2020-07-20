@@ -20,8 +20,8 @@ RUN apt-get update &&\
 		tqdm \
 		matplotlib \
 		tensorboardX \
-		# torch==1.0.1 torchvision==0.2.2
-		torch==1.2.0 torchvision==0.4.0
+		torch==1.0.1 torchvision==0.2.2
+		# torch==1.2.0 torchvision==0.4.0
 ######### NO cache ##########
 ARG CACHEBUST=1
 ######### My package ##########
