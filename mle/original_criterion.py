@@ -25,6 +25,20 @@ def getCov(x):
     cov[:, 2, 2] = szz
     return cov
 
+def getTriangularMatrix(outputs):
+    elements = outputs[:, 3:9].clone()
+    L = torch.zeros(outputs.size(0), elements.size(1)//2, elements.size(1)//2)
+    # L[:, 0, 0] = elements[:, 0]
+    L[:, 0, 0] = torch.exp(elements[:, 0])
+    L[:, 1, 0] = elements[:, 1]
+    # L[:, 1, 1] = elements[:, 2]
+    L[:, 1, 1] = torch.exp(elements[:, 2])
+    L[:, 2, 0] = elements[:, 3]
+    L[:, 2, 1] = elements[:, 4]
+    # L[:, 2, 2] = elements[:, 5]
+    L[:, 2, 2] = torch.exp(elements[:, 5])
+    return L
+
 def computeDet(m):
     det = m[:, 0, 0] * (m[:, 1, 1] * m[:, 2, 2] - m[:, 1, 2] * m[:, 2, 1]) - (m[:, 0, 1] * (m[:, 1, 0] * m[:, 2, 2] - m[:, 1, 2] * m[:, 2, 0])) + (m[:, 0, 2] * (m[:, 1, 0] * m[:, 2, 1] - m[:, 1, 1] * m[:, 2, 0]))
     return det
@@ -34,6 +48,8 @@ def originalCriterion(outputs, labels):
     k = labels.size(1)
     mu = outputs[:, :3].clone()
     cov = getCov(outputs)
+    L = getTriangularMatrix(outputs)
+    Ltrans = torch.transpose(L, 1, 2)
 
     # cov_inv = torch.inverse(cov)
     # cov_det = computeDet(cov)
@@ -55,15 +71,23 @@ def originalCriterion(outputs, labels):
     # print("loss = ", loss)
 
     cov = cov.to(device)
-    print("cov = ", cov)
-    m = torch.distributions.MultivariateNormal(mu, cov)
-    loss = -m.log_prob(labels)
+    L = L.to(device)
+    Ltrans = Ltrans.to(device)
+    LL = torch.bmm(L, Ltrans)
+    # print("cov = ", cov)
+    # dist = torch.distributions.MultivariateNormal(mu, cov)
+    # dist = torch.distributions.MultivariateNormal(mu, LL)
+    dist = torch.distributions.MultivariateNormal(mu, scale_tril=L)
+    loss = -dist.log_prob(labels)
     print("loss = ", loss)
     for i in range(loss.size(0)):
         if torch.isnan(loss[i]):
             print("torch.isnan(loss[i]) = ", torch.isnan(loss[i]))
             print("outputs[i] = ", outputs[i])
-            print("cov[i] = ", cov[i])
+            # print("cov[i] = ", cov[i])
+            print("L[i] = ", L[i])
+            print("Ltrans[i] = ", Ltrans[i])
+            print("LL[i] = ", LL[i])
     loss = loss.mean()
     print("loss = ", loss)
 

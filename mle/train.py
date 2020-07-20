@@ -142,9 +142,13 @@ list_cnn_param_value, list_fc_param_value = net.getParamValueList()
 
 ## optimizer
 optimizer = optim.SGD([
-    {"params": list_cnn_param_value, "lr": 1e-4},
-    {"params": list_fc_param_value, "lr": 1e-3}
+    {"params": list_cnn_param_value, "lr": 1e-5},
+    {"params": list_fc_param_value, "lr": 1e-4}
 ], momentum=0.9)
+# optimizer = optim.Adam([
+#     {"params": list_cnn_param_value, "lr": 1e-4},
+#     {"params": list_fc_param_value, "lr": 1e-3}
+# ])
 print(optimizer)
 
 ## execution
