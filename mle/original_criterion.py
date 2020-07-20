@@ -79,7 +79,7 @@ def originalCriterion(outputs, labels):
     # dist = torch.distributions.MultivariateNormal(mu, LL)
     dist = torch.distributions.MultivariateNormal(mu, scale_tril=L)
     loss = -dist.log_prob(labels)
-    print("loss = ", loss)
+    # print("loss = ", loss)
     for i in range(loss.size(0)):
         if torch.isnan(loss[i]):
             print("torch.isnan(loss[i]) = ", torch.isnan(loss[i]))
@@ -89,7 +89,7 @@ def originalCriterion(outputs, labels):
             print("Ltrans[i] = ", Ltrans[i])
             print("LL[i] = ", LL[i])
     loss = loss.mean()
-    print("loss = ", loss)
+    # print("loss = ", loss)
 
     # loss = torch.mean((mu - labels)**2)
     return loss
