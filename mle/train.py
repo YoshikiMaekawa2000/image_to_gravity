@@ -94,7 +94,7 @@ std_element = 0.5
 lr0 = 1e-5
 lr1 = 1e-4
 batch_size = 50
-num_epochs = 100
+num_epochs = 50
 str_hyperparameter = "mle_"\
     + "mean" + str(mean_element) \
     + "std" + str(std_element) \
