@@ -23,9 +23,9 @@ def originalCriterion(outputs, labels, device):
     # Ltrans = Ltrans.to(device)
     # LL = torch.bmm(L, Ltrans)
 
-    ratio = 10.0
-    mu = ratio * mu
-    labels = ratio * labels
+    # ratio = 10.0
+    # mu = ratio * mu
+    # labels = ratio * labels
 
     dist = torch.distributions.MultivariateNormal(mu, scale_tril=L)
     loss = -dist.log_prob(labels)
