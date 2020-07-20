@@ -70,7 +70,7 @@ def train_model(net, dataloaders_dict, optimizer, num_epochs, str_hyperparameter
                 record_loss_val.append(epoch_loss)
                 writer.add_scalar("Loss/val", epoch_loss, epoch)
     ## save param
-    save_path = "../weights/mle.pth"
+    save_path = "../weights/" + str_hyperparameter + ".pth"
     torch.save(net.state_dict(), save_path)
     print("Parameter file is saved as ", save_path)
 
@@ -82,7 +82,7 @@ def train_model(net, dataloaders_dict, optimizer, num_epochs, str_hyperparameter
     plt.xlabel("Epoch")
     plt.ylabel("Error")
     plt.title(str_hyperparameter)
-    graph.savefig("../graph/mle.jpg")
+    graph.savefig("../graph/" + str_hyperparameter + ".jpg")
     plt.show()
 
     writer.close()
@@ -91,6 +91,7 @@ def train_model(net, dataloaders_dict, optimizer, num_epochs, str_hyperparameter
 ## hyperparameter
 mean_element = 0.25
 std_element = 0.5
+str_optimizer = "Adam"
 lr0 = 1e-5
 lr1 = 1e-4
 batch_size = 50
@@ -98,6 +99,7 @@ num_epochs = 50
 str_hyperparameter = "mle_"\
     + "mean" + str(mean_element) \
     + "std" + str(std_element) \
+    + str_optimizer \
     + "lr" + str(lr0) \
     + "lr" + str(lr1) \
     + "batch" + str(batch_size) \
@@ -156,14 +158,16 @@ print(net)
 list_cnn_param_value, list_fc_param_value = net.getParamValueList()
 
 ## optimizer
-# optimizer = optim.SGD([
-#     {"params": list_cnn_param_value, "lr": lr0},
-#     {"params": list_fc_param_value, "lr": lr1}
-# ], momentum=0.9)
-optimizer = optim.Adam([
-    {"params": list_cnn_param_value, "lr": lr0},
-    {"params": list_fc_param_value, "lr": lr1}
-])
+if str_optimizer == "SGD":
+    optimizer = optim.SGD([
+        {"params": list_cnn_param_value, "lr": lr0},
+        {"params": list_fc_param_value, "lr": lr1}
+    ], momentum=0.9)
+elif str_optimizer == "Adam":
+    optimizer = optim.Adam([
+        {"params": list_cnn_param_value, "lr": lr0},
+        {"params": list_fc_param_value, "lr": lr1}
+    ])
 print(optimizer)
 
 ## execution
