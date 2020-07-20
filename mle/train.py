@@ -50,7 +50,7 @@ def train_model(net, dataloaders_dict, optimizer, num_epochs):
                 with torch.set_grad_enabled(phase == "train"):  #compute grad only in "train"
                     ## forward
                     outputs = net(inputs)
-                    loss = original_criterion.originalCriterion(outputs, labels)
+                    loss = original_criterion.originalCriterion(outputs, labels, device)
 
                     ## backward
                     if phase == "train":
@@ -71,7 +71,7 @@ def train_model(net, dataloaders_dict, optimizer, num_epochs):
                 record_loss_val.append(epoch_loss)
                 writer.add_scalar("Loss/val", epoch_loss, epoch)
     ## save param
-    save_path = "../weights/weights_image_to_gravity.pth"
+    save_path = "../weights/mle.pth"
     torch.save(net.state_dict(), save_path)
     print("Parameter file is saved as ", save_path)
 
@@ -82,7 +82,7 @@ def train_model(net, dataloaders_dict, optimizer, num_epochs):
     plt.legend()
     plt.xlabel("Epoch")
     plt.ylabel("Error")
-    graph.savefig("../graph/graph.jpg")
+    graph.savefig("../graph/mle.jpg")
     plt.show()
 
     writer.close()

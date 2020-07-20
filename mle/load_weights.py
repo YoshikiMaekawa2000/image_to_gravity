@@ -11,6 +11,7 @@ import make_datapath_list
 import data_transform
 import original_dataset
 import original_network
+import original_criterion
 
 ## device
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -23,7 +24,7 @@ net.to(device)
 net.eval()
 
 ## saved in CPU -> load in CPU, saved in GPU -> load in GPU
-load_path = "../weights/weights_image_to_gravity.pth"
+load_path = "../weights/mle.pth"
 load_weights = torch.load(load_path)
 net.load_state_dict(load_weights)
 
@@ -68,6 +69,7 @@ inputs_device = inputs.to(device)
 labels_device = labels.to(device)
 outputs = net(inputs_device)
 print("outputs = ", outputs)
+Cov = original_criterion.getCovMatrix(outputs)
 
 plt.figure()
 i = 0
@@ -84,11 +86,13 @@ def accToRP(acc):
 
 th_outlier_deg = 5.0
 for i in range(inputs.size(0)):
+    mu = outputs[i, :3]
     print(i)
     print("label: ", labels[i])
-    print("output: ", outputs[i])
+    print("mu: ", mu)
+    print("Cov: ", Cov[i])
     l_r, l_p = accToRP(labels[i])
-    o_r, o_p = accToRP(outputs[i])
+    o_r, o_p = accToRP(mu)
     e_r = math.atan2(math.sin(l_r - o_r), math.cos(l_r - o_r))
     e_p = math.atan2(math.sin(l_p - o_p), math.cos(l_p - o_p))
     print("e_r[deg]: ", e_r/math.pi*180.0, " e_p[deg]: ", e_p/math.pi*180.0)
