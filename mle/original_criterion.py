@@ -46,6 +46,13 @@ def getCovMatrix(outputs):
     LL = torch.bmm(L, Ltrans)
     return LL
 
+def computeDet(m):
+    det = \
+        m[:, 0, 0] * (m[:, 1, 1] * m[:, 2, 2] - m[:, 1, 2] * m[:, 2, 1]) \
+        - (m[:, 0, 1] * (m[:, 1, 0] * m[:, 2, 2] - m[:, 1, 2] * m[:, 2, 0])) \
+        + (m[:, 0, 2] * (m[:, 1, 0] * m[:, 2, 1] - m[:, 1, 1] * m[:, 2, 0]))
+    return det
+
 ##### test #####
 # outputs = np.array([
 #     [1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 0.5, 0.5, 0.5],

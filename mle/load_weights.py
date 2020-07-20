@@ -69,6 +69,7 @@ inputs_device = inputs.to(device)
 labels_device = labels.to(device)
 outputs = net(inputs_device)
 print("outputs = ", outputs)
+mu = outputs[:, :3]
 Cov = original_criterion.getCovMatrix(outputs)
 
 plt.figure()
@@ -86,10 +87,9 @@ def accToRP(acc):
 
 th_outlier_deg = 5.0
 for i in range(inputs.size(0)):
-    mu = outputs[i, :3]
     print(i)
     print("label: ", labels[i])
-    print("mu: ", mu)
+    print("mu: ", mu[i])
     print("Cov: ", Cov[i])
     l_r, l_p = accToRP(labels[i])
     o_r, o_p = accToRP(mu)
