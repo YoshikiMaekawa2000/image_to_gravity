@@ -96,15 +96,6 @@ lr0 = 1e-5
 lr1 = 1e-4
 batch_size = 50
 num_epochs = 50
-str_hyperparameter = "mle_"\
-    + "mean" + str(mean_element) \
-    + "std" + str(std_element) \
-    + str_optimizer \
-    + "lr" + str(lr0) \
-    + "lr" + str(lr1) \
-    + "batch" + str(batch_size) \
-    + "epoch" + str(num_epochs)
-print("str_hyperparameter = ", str_hyperparameter)
 
 ## random
 keep_reproducibility = False
@@ -153,7 +144,6 @@ print(net)
 # vgg = models.vgg16(pretrained=True)
 # print(vgg)
 
-
 ## param
 list_cnn_param_value, list_fc_param_value = net.getParamValueList()
 
@@ -169,6 +159,19 @@ elif str_optimizer == "Adam":
         {"params": list_fc_param_value, "lr": lr1}
     ])
 print(optimizer)
+
+## hyperparameter strig
+str_hyperparameter = "mle_" \
+    + "train" + str(len(dataloaders_dict["train"].dataset)) \
+    + "val" + str(len(dataloaders_dict["val"].dataset)) \
+    + "mean" + str(mean_element) \
+    + "std" + str(std_element) \
+    + str_optimizer \
+    + "lr" + str(lr0) \
+    + "lr" + str(lr1) \
+    + "batch" + str(batch_size) \
+    + "epoch" + str(num_epochs)
+print("str_hyperparameter = ", str_hyperparameter)
 
 ## execution
 start_clock = time.time()
