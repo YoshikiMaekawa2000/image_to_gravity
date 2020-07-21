@@ -87,12 +87,12 @@ def accToRP(acc):
 
 th_outlier_deg = 5.0
 for i in range(inputs.size(0)):
-    print(i)
+    print("-----", i, "-----")
     print("label: ", labels[i])
     print("mu: ", mu[i])
     print("Cov: ", Cov[i])
     l_r, l_p = accToRP(labels[i])
-    o_r, o_p = accToRP(mu)
+    o_r, o_p = accToRP(mu[i])
     e_r = math.atan2(math.sin(l_r - o_r), math.cos(l_r - o_r))
     e_p = math.atan2(math.sin(l_p - o_p), math.cos(l_p - o_p))
     print("e_r[deg]: ", e_r/math.pi*180.0, " e_p[deg]: ", e_p/math.pi*180.0)
