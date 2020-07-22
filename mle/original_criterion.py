@@ -19,9 +19,7 @@ def originalCriterion(outputs, labels, device):
     L = getTriangularMatrix(outputs)
     L = L.to(device)
     LL = getCovMatrix(outputs)
-    # Ltrans = torch.transpose(L, 1, 2)
     # Ltrans = Ltrans.to(device)
-    # LL = torch.bmm(L, Ltrans)
 
     # ratio = 10.0
     # mu = ratio * mu
