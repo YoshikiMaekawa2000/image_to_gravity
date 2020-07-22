@@ -1,12 +1,14 @@
 import csv
 import os
 
-def make_datapath_list(rootpath, csv_name):
+def make_datapath_list(rootpath, csv_name, max_num=-1):
     csvpath = os.path.join(rootpath, csv_name)
     with open(csvpath) as csvfile:
         reader = csv.reader(csvfile)
         data_list = []
         for row in reader:
+            if (max_num > 0) and (len(data_list) >= max_num):
+                break
             # print(row)
             # print(row[:3])
             # print(row[3])
