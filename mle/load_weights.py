@@ -85,12 +85,21 @@ def accToRP(acc):
     print("r[deg]: ", r/math.pi*180.0, " p[deg]: ", p/math.pi*180.0)
     return r, p
 
+def printConfidenceInterval(Cov):
+    ## 95%confidence -> 1.96*sigma
+    gx_range = 1.96 * torch.sqrt(Cov[0, 0])
+    gy_range = 1.96 * torch.sqrt(Cov[1, 1])
+    gz_range = 1.96 * torch.sqrt(Cov[2, 2])
+    mul_sigma = torch.sqrt(Cov[0, 0]) * torch.sqrt(Cov[1, 1]) * torch.sqrt(Cov[2, 2])
+    print("mul_sigma = ", mul_sigma)
+
 th_outlier_deg = 5.0
 for i in range(inputs.size(0)):
     print("-----", i, "-----")
     print("label: ", labels[i])
     print("mu: ", mu[i])
     print("Cov: ", Cov[i])
+    printConfidenceInterval(Cov[i])
     l_r, l_p = accToRP(labels[i])
     o_r, o_p = accToRP(mu[i])
     e_r = math.atan2(math.sin(l_r - o_r), math.cos(l_r - o_r))
@@ -105,6 +114,7 @@ for i in range(inputs.size(0)):
             plt.title(str(i) + "*")
         else:
             plt.title(i)
+            print("BIG ERROR")
         plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
 
 print("---ave---\n e_r[deg]: ", sum_r/inputs.size(0)/math.pi*180.0, " e_p[deg]: ", sum_p/inputs.size(0)/math.pi*180.0)
