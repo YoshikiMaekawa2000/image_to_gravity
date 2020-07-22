@@ -77,29 +77,23 @@ i = 0
 h = 5
 w = 10
 
-sum_r = 0.0
-sum_p = 0.0
+list_r = []
+list_p = []
+list_r_selected = []
+list_p_selected = []
 def accToRP(acc):
     r = math.atan2(acc[1], acc[2])
     p = math.atan2(-acc[0], math.sqrt(acc[1]*acc[1] + acc[2]*acc[2]))
     print("r[deg]: ", r/math.pi*180.0, " p[deg]: ", p/math.pi*180.0)
     return r, p
 
-def printConfidenceInterval(Cov):
-    ## 95%confidence -> 1.96*sigma
-    gx_range = 1.96 * torch.sqrt(Cov[0, 0])
-    gy_range = 1.96 * torch.sqrt(Cov[1, 1])
-    gz_range = 1.96 * torch.sqrt(Cov[2, 2])
-    mul_sigma = torch.sqrt(Cov[0, 0]) * torch.sqrt(Cov[1, 1]) * torch.sqrt(Cov[2, 2])
-    print("mul_sigma = ", mul_sigma)
-
 th_outlier_deg = 10.0
+th_outlier_sigma = 0.001
 for i in range(inputs.size(0)):
     print("-----", i, "-----")
     print("label: ", labels[i])
     print("mu: ", mu[i])
     print("Cov: ", Cov[i])
-    printConfidenceInterval(Cov[i])
 
     l_r, l_p = accToRP(labels[i])
     o_r, o_p = accToRP(mu[i])
@@ -113,8 +107,16 @@ for i in range(inputs.size(0)):
         is_big_error = True
         print("BIG ERROR")
 
-    sum_r += abs(e_r)
-    sum_p += abs(e_p)
+    list_r.append(abs(e_r))
+    list_p.append(abs(e_p))
+
+    mul_sigma = torch.sqrt(Cov[i, 0, 0]) * torch.sqrt(Cov[i, 1, 1]) * torch.sqrt(Cov[i, 2, 2])
+    print("mul_sigma = ", mul_sigma)
+    if mul_sigma < th_outlier_sigma:
+        list_r_selected.append(abs(e_r))
+        list_p_selected.append(abs(e_p))
+    
+    ## graph
     if i < h*w:
         plt.subplot(h, w, i+1)
         plt.imshow(np.clip(inputs[i].numpy().transpose((1, 2, 0)), 0, 1))
@@ -124,6 +126,12 @@ for i in range(inputs.size(0)):
             plt.title(i)
         plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
 
-print("---ave---\n e_r[deg]: ", sum_r/inputs.size(0)/math.pi*180.0, " e_p[deg]: ", sum_p/inputs.size(0)/math.pi*180.0)
+list_r = np.array(list_r)
+list_p = np.array(list_p)
+print("---ave---\n e_r[deg]: ", list_r.mean()/math.pi*180.0, " e_p[deg]: ",  list_p.mean()/math.pi*180.0)
+list_r_selected = np.array(list_r_selected)
+list_p_selected = np.array(list_p_selected)
+print("---selected ave---\n e_r[deg]: ", list_r_selected.mean()/math.pi*180.0, " e_p[deg]: ",  list_p_selected.mean()/math.pi*180.0)
+print("list_r_selected.size() = ", list_r_selected.size)
 
 plt.show()
