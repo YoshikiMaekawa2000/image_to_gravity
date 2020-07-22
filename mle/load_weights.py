@@ -88,7 +88,7 @@ def accToRP(acc):
     return r, p
 
 th_outlier_deg = 10.0
-th_outlier_sigma = 0.001
+th_outlier_sigma = 0.005
 for i in range(inputs.size(0)):
     print("-----", i, "-----")
     print("label: ", labels[i])
@@ -115,6 +115,8 @@ for i in range(inputs.size(0)):
     if mul_sigma < th_outlier_sigma:
         list_r_selected.append(abs(e_r))
         list_p_selected.append(abs(e_p))
+    else:
+        print("BIG SIGMA")
     
     ## graph
     if i < h*w:
@@ -132,6 +134,6 @@ print("---ave---\n e_r[deg]: ", list_r.mean()/math.pi*180.0, " e_p[deg]: ",  lis
 list_r_selected = np.array(list_r_selected)
 list_p_selected = np.array(list_p_selected)
 print("---selected ave---\n e_r[deg]: ", list_r_selected.mean()/math.pi*180.0, " e_p[deg]: ",  list_p_selected.mean()/math.pi*180.0)
-print("list_r_selected.size() = ", list_r_selected.size)
+print("list_r_selected.size = ", list_r_selected.size)
 
 plt.show()
