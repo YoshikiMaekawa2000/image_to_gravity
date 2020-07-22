@@ -100,21 +100,28 @@ for i in range(inputs.size(0)):
     print("mu: ", mu[i])
     print("Cov: ", Cov[i])
     printConfidenceInterval(Cov[i])
+
     l_r, l_p = accToRP(labels[i])
     o_r, o_p = accToRP(mu[i])
     e_r = math.atan2(math.sin(l_r - o_r), math.cos(l_r - o_r))
     e_p = math.atan2(math.sin(l_p - o_p), math.cos(l_p - o_p))
     print("e_r[deg]: ", e_r/math.pi*180.0, " e_p[deg]: ", e_p/math.pi*180.0)
+
+    if (abs(e_r/math.pi*180.0) < th_outlier_deg) and (abs(e_p/math.pi*180.0) < th_outlier_deg):
+        is_big_error = False
+    else:
+        is_big_error = True
+        print("BIG ERROR")
+
     sum_r += abs(e_r)
     sum_p += abs(e_p)
     if i < h*w:
         plt.subplot(h, w, i+1)
         plt.imshow(np.clip(inputs[i].numpy().transpose((1, 2, 0)), 0, 1))
-        if (abs(e_r/math.pi*180.0) < th_outlier_deg) and (abs(e_p/math.pi*180.0) < th_outlier_deg):
+        if not is_big_error:
             plt.title(str(i) + "*")
         else:
             plt.title(i)
-            print("BIG ERROR")
         plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
 
 print("---ave---\n e_r[deg]: ", sum_r/inputs.size(0)/math.pi*180.0, " e_p[deg]: ", sum_p/inputs.size(0)/math.pi*180.0)
