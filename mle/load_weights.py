@@ -110,7 +110,7 @@ for i in range(inputs.size(0)):
     if i < h*w:
         plt.subplot(h, w, i+1)
         plt.imshow(np.clip(inputs[i].numpy().transpose((1, 2, 0)), 0, 1))
-        if (abs(e_r/math.pi*180.0) < th_outlier_deg) or (abs(e_p/math.pi*180.0) < th_outlier_deg):
+        if (abs(e_r/math.pi*180.0) < th_outlier_deg) and (abs(e_p/math.pi*180.0) < th_outlier_deg):
             plt.title(str(i) + "*")
         else:
             plt.title(i)
