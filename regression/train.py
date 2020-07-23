@@ -13,7 +13,7 @@ import data_transform
 import original_dataset
 import original_network
 
-def train_model(net, dataloaders_dict, criterion, optimizer, num_epochs):
+def train_model(net, dataloaders_dict, criterion, optimizer, num_epochs, str_hyperparameter):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("device = ", device)
 
@@ -69,7 +69,7 @@ def train_model(net, dataloaders_dict, criterion, optimizer, num_epochs):
                 record_loss_val.append(epoch_loss)
                 writer.add_scalar("Loss/val", epoch_loss, epoch)
     ## save param
-    save_path = "../weights/weights_image_to_gravity.pth"
+    save_path = "../weights/" + str_hyperparameter + ".pth"
     torch.save(net.state_dict(), save_path)
     print("Parameter file is saved as ", save_path)
 
@@ -80,12 +80,22 @@ def train_model(net, dataloaders_dict, criterion, optimizer, num_epochs):
     plt.legend()
     plt.xlabel("Epoch")
     plt.ylabel("Error")
-    graph.savefig("../graph/graph.jpg")
+    plt.title(str_hyperparameter)
+    graph.savefig("../graph/" + str_hyperparameter + ".jpg")
     plt.show()
 
     writer.close()
 
 ##### execution #####
+## hyperparameter
+mean_element = 0.25
+std_element = 0.5
+str_optimizer = "Adam"
+lr0 = 1e-5
+lr1 = 1e-4
+batch_size = 50
+num_epochs = 50
+
 ## random
 keep_reproducibility = False
 if keep_reproducibility:
@@ -104,8 +114,8 @@ val_list = make_datapath_list.make_datapath_list(val_rootpath, csv_name)
 
 ## trans param
 size = 224  #VGG16
-mean = ([0.25, 0.25, 0.25])
-std = ([0.5, 0.5, 0.5])
+mean = ([mean_element, mean_element, mean_element])
+std = ([std_element, std_element, std_element])
 
 ## dataset
 train_dataset = original_dataset.OriginalDataset(
@@ -120,7 +130,6 @@ val_dataset = original_dataset.OriginalDataset(
 )
 
 ## dataloader
-batch_size = 100
 print("batch_size = ", batch_size)
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
@@ -142,16 +151,34 @@ print(net)
 list_cnn_param_value, list_fc_param_value = net.getParamValueList()
 
 ## optimizer
-optimizer = optim.SGD([
-    {"params": list_cnn_param_value, "lr": 1e-4},
-    {"params": list_fc_param_value, "lr": 1e-3}
-], momentum=0.9)
+if str_optimizer == "SGD":
+    optimizer = optim.SGD([
+        {"params": list_cnn_param_value, "lr": lr0},
+        {"params": list_fc_param_value, "lr": lr1}
+    ], momentum=0.9)
+elif str_optimizer == "Adam":
+    optimizer = optim.Adam([
+        {"params": list_cnn_param_value, "lr": lr0},
+        {"params": list_fc_param_value, "lr": lr1}
+    ])
 print(optimizer)
 
-## execution
-num_epochs = 100
+## hyperparameter strig
+str_hyperparameter = "regression_" \
+    + "train" + str(len(dataloaders_dict["train"].dataset)) \
+    + "val" + str(len(dataloaders_dict["val"].dataset)) \
+    + "mean" + str(mean_element) \
+    + "std" + str(std_element) \
+    + str_optimizer \
+    + "lr" + str(lr0) \
+    + "lr" + str(lr1) \
+    + "batch" + str(batch_size) \
+    + "epoch" + str(num_epochs)
+print("str_hyperparameter = ", str_hyperparameter)
+
+## train
 start_clock = time.time()
-train_model(net, dataloaders_dict, criterion, optimizer, num_epochs=num_epochs)
+train_model(net, dataloaders_dict, criterion, optimizer, num_epochs=num_epochs, str_hyperparameter)
 ## training time
 mins = (time.time() - start_clock) // 60
 secs = (time.time() - start_clock) % 60

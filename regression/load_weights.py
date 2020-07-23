@@ -23,7 +23,7 @@ net.to(device)
 net.eval()
 
 ## saved in CPU -> load in CPU, saved in GPU -> load in GPU
-load_path = "../weights/weights_image_to_gravity.pth"
+load_path = "../weights/regression.pth"
 load_weights = torch.load(load_path)
 net.load_state_dict(load_weights)
 

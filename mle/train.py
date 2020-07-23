@@ -173,7 +173,7 @@ str_hyperparameter = "mle_" \
     + "epoch" + str(num_epochs)
 print("str_hyperparameter = ", str_hyperparameter)
 
-## execution
+## train
 start_clock = time.time()
 train_model(net, dataloaders_dict, optimizer, num_epochs, str_hyperparameter)
 ## training time

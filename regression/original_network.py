@@ -57,6 +57,8 @@ class OriginalNet(nn.Module):
         # print("fc-in", x.size())
         x = self.fc(x)
         # print("fc-out", x.size())
+        l2norm = torch.norm(x[:, :3].clone(), p=2, dim=1, keepdim=True)
+        x[:, :3] = torch.div(x[:, :3].clone(), l2norm)  #L2Norm, |(gx, gy, gz)| = 1
         return x
 
 ##### test #####

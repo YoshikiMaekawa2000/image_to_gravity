@@ -45,6 +45,7 @@ class data_transform():
 
         img_tensor = self.data_transform[phase](img)
         acc = acc.astype(np.float32)
+        acc = acc / np.linalg.norm(acc)
         acc_tensor = torch.from_numpy(acc)
 
         return img_tensor, acc_tensor
