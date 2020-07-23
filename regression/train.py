@@ -178,7 +178,7 @@ print("str_hyperparameter = ", str_hyperparameter)
 
 ## train
 start_clock = time.time()
-train_model(net, dataloaders_dict, criterion, optimizer, num_epochs=num_epochs, str_hyperparameter)
+train_model(net, dataloaders_dict, criterion, optimizer, num_epochs, str_hyperparameter)
 ## training time
 mins = (time.time() - start_clock) // 60
 secs = (time.time() - start_clock) % 60
