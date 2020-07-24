@@ -33,21 +33,14 @@ mean = ([0.25, 0.25, 0.25])
 std = ([0.5, 0.5, 0.5])
 
 ## list
-train_rootpath = "../dataset/train"
 val_rootpath = "../dataset/val"
 csv_name = "imu_camera.csv"
-train_list = make_datapath_list.make_datapath_list(train_rootpath, csv_name)
 val_list = make_datapath_list.make_datapath_list(val_rootpath, csv_name)
 
 ## transform
 transform = data_transform.data_transform(size, mean, std)
 
 ## dataset
-train_dataset = original_dataset.OriginalDataset(
-    data_list=train_list,
-    transform=data_transform.data_transform(size, mean, std),
-    phase="train"
-)
 val_dataset = original_dataset.OriginalDataset(
     data_list=val_list,
     transform=data_transform.data_transform(size, mean, std),
@@ -56,16 +49,14 @@ val_dataset = original_dataset.OriginalDataset(
 
 ## dataloader
 batch_size = 10
-train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
-dataloaders_dict = {"train": train_dataloader, "val": val_dataloader}
 
 ## predict
 inputs_arr = np.empty(0)
 labels_arr = np.empty([0, 3])
 mu_arr = np.empty([0, 3])
 cov_arr = np.empty([0, 3, 3])
-for inputs, labels in dataloaders_dict["val"]:
+for inputs, labels in val_dataloader:
     inputs = inputs.to(device)
     outputs = net(inputs)
     Cov = original_criterion.getCovMatrix(outputs)
@@ -98,6 +89,7 @@ list_r = []
 list_p = []
 list_r_selected = []
 list_p_selected = []
+list_mul_sigma = []
 th_outlier_deg = 10.0
 th_outlier_sigma = 0.005
 for i in range(labels_arr.shape[0]):
@@ -125,6 +117,7 @@ for i in range(labels_arr.shape[0]):
 
     mul_sigma = math.sqrt(cov_arr[i, 0, 0]) * math.sqrt(cov_arr[i, 1, 1]) * math.sqrt(cov_arr[i, 2, 2])
     print("mul_sigma = ", mul_sigma)
+    list_mul_sigma.append(mul_sigma)
     if mul_sigma < th_outlier_sigma:
         list_r_selected.append(abs(e_r))
         list_p_selected.append(abs(e_p))
@@ -141,12 +134,17 @@ for i in range(labels_arr.shape[0]):
         else:
             plt.title(i)
 
+## error
 list_r = np.array(list_r)
 list_p = np.array(list_p)
 print("---ave---\n e_r[deg]: ", list_r.mean()/math.pi*180.0, " e_p[deg]: ",  list_p.mean()/math.pi*180.0)
+## selected error
 list_r_selected = np.array(list_r_selected)
 list_p_selected = np.array(list_p_selected)
 print("---selected ave---\n e_r[deg]: ", list_r_selected.mean()/math.pi*180.0, " e_p[deg]: ",  list_p_selected.mean()/math.pi*180.0)
 print("list_r_selected.size = ", list_r_selected.size)
+## mul_sigma
+list_mul_sigma = np.array(list_mul_sigma)
+print("list_mul_sigma.mean() = ", list_mul_sigma.mean())
 
 plt.show()
