@@ -1,3 +1,4 @@
+from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -55,63 +56,49 @@ val_dataset = original_dataset.OriginalDataset(
 )
 
 ## dataloader
-batch_size = 10
+batch_size = 50
 train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 dataloaders_dict = {"train": train_dataloader, "val": val_dataloader}
 
 ## predict
-inputs_arr = np.empty(0)
-labels_arr = np.empty([0, 3])
-mu_arr = np.empty([0, 3])
-cov_arr = np.empty([0, 3, 3])
-for inputs, labels in dataloaders_dict["val"]:
-    inputs = inputs.to(device)
-    outputs = net(inputs)
-    Cov = original_criterion.getCovMatrix(outputs)
-    ## tensor -> numpy
-    inputs_arr = np.append(
-        inputs_arr.reshape(-1, inputs.size(1), inputs.size(2), inputs.size(3)),
-        inputs.cpu().detach().numpy(),
-        axis=0
-    )
-    labels_arr = np.append(labels_arr, labels.cpu().detach().numpy(), axis=0)
-    mu_arr = np.append(mu_arr, outputs[:, :3].cpu().detach().numpy(), axis=0)
-    cov_arr = np.append(cov_arr, Cov.cpu().detach().numpy(), axis=0)
+# batch_iterator = iter(dataloaders_dict["train"])
+batch_iterator = iter(dataloaders_dict["val"])
+inputs, labels = next(batch_iterator)
+inputs_device = inputs.to(device)
+labels_device = labels.to(device)
+outputs = net(inputs_device)
+print("outputs = ", outputs)
+mu = outputs[:, :3]
+Cov = original_criterion.getCovMatrix(outputs)
 
-print("inputs_arr.shape = ", inputs_arr.shape)
-print("mu_arr.shape = ", mu_arr.shape)
-print("cov_arr.shape = ", cov_arr.shape)
-
-## graph
 plt.figure()
+i = 0
 h = 5
 w = 10
 
-def accToRP(acc):
-    r = math.atan2(acc[1], acc[2])
-    p = math.atan2(-acc[0], math.sqrt(acc[1]*acc[1] + acc[2]*acc[2]))
-    return r, p
-
-## access each sample
 list_r = []
 list_p = []
 list_r_selected = []
 list_p_selected = []
+def accToRP(acc):
+    r = math.atan2(acc[1], acc[2])
+    p = math.atan2(-acc[0], math.sqrt(acc[1]*acc[1] + acc[2]*acc[2]))
+    print("r[deg]: ", r/math.pi*180.0, " p[deg]: ", p/math.pi*180.0)
+    return r, p
+
 th_outlier_deg = 10.0
 th_outlier_sigma = 0.005
-for i in range(labels_arr.shape[0]):
+for i in range(inputs.size(0)):
     print("-----", i, "-----")
-    print("label: ", labels_arr[i])
-    print("mu: ", mu_arr[i])
-    print("Cov: ", cov_arr[i])
+    print("label: ", labels[i])
+    print("mu: ", mu[i])
+    print("Cov: ", Cov[i])
 
-    l_r, l_p = accToRP(labels_arr[i])
-    o_r, o_p = accToRP(mu_arr[i])
+    l_r, l_p = accToRP(labels[i])
+    o_r, o_p = accToRP(mu[i])
     e_r = math.atan2(math.sin(l_r - o_r), math.cos(l_r - o_r))
     e_p = math.atan2(math.sin(l_p - o_p), math.cos(l_p - o_p))
-    print("l_r[deg]: ", l_r/math.pi*180.0, " l_p[deg]: ", l_p/math.pi*180.0)
-    print("o_r[deg]: ", o_r/math.pi*180.0, " o_p[deg]: ", o_p/math.pi*180.0)
     print("e_r[deg]: ", e_r/math.pi*180.0, " e_p[deg]: ", e_p/math.pi*180.0)
 
     if (abs(e_r/math.pi*180.0) < th_outlier_deg) and (abs(e_p/math.pi*180.0) < th_outlier_deg):
@@ -123,7 +110,7 @@ for i in range(labels_arr.shape[0]):
     list_r.append(abs(e_r))
     list_p.append(abs(e_p))
 
-    mul_sigma = math.sqrt(cov_arr[i, 0, 0]) * math.sqrt(cov_arr[i, 1, 1]) * math.sqrt(cov_arr[i, 2, 2])
+    mul_sigma = torch.sqrt(Cov[i, 0, 0]) * torch.sqrt(Cov[i, 1, 1]) * torch.sqrt(Cov[i, 2, 2])
     print("mul_sigma = ", mul_sigma)
     if mul_sigma < th_outlier_sigma:
         list_r_selected.append(abs(e_r))
@@ -134,12 +121,12 @@ for i in range(labels_arr.shape[0]):
     ## graph
     if i < h*w:
         plt.subplot(h, w, i+1)
-        plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
-        plt.imshow(np.clip(inputs_arr[i].transpose((1, 2, 0)), 0, 1))
+        plt.imshow(np.clip(inputs[i].numpy().transpose((1, 2, 0)), 0, 1))
         if not is_big_error:
             plt.title(str(i) + "*")
         else:
             plt.title(i)
+        plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
 
 list_r = np.array(list_r)
 list_p = np.array(list_p)
