@@ -56,7 +56,7 @@ class data_transform():
 # mean = ([0.25, 0.25, 0.25])
 # std = ([0.5, 0.5, 0.5])
 # ## image
-# image_file_path = "..//dataset/example.jpg"
+# image_file_path = "../dataset/example.jpg"
 # img = Image.open(image_file_path)
 # print("img.size = ", img.size)
 # ## label
@@ -70,6 +70,10 @@ class data_transform():
 # img_trans_numpy = img_trans.numpy().transpose((1, 2, 0))  #(rgb, h, w) -> (h, w, rgb)
 # img_trans_numpy = np.clip(img_trans_numpy, 0, 1)
 # print("img_trans_numpy.shape = ", img_trans_numpy.shape)
+# ## save
+# # save_path = "../dataset/rotated_example.jpg"
+# # img_pil = Image.fromarray(np.uint8(255*img_trans_numpy))
+# # img_pil.save(save_path)
 # ## imshow
 # plt.figure()
 # plt.subplot(1, 2, 1)
