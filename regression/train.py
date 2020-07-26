@@ -79,7 +79,7 @@ def train_model(net, dataloaders_dict, criterion, optimizer, num_epochs, str_hyp
     plt.plot(range(len(record_loss_val)), record_loss_val, label="Validation")
     plt.legend()
     plt.xlabel("Epoch")
-    plt.ylabel("Error")
+    plt.ylabel("Loss")
     plt.title(str_hyperparameter)
     graph.savefig("../graph/" + str_hyperparameter + ".jpg")
     plt.show()
