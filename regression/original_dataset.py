@@ -37,7 +37,7 @@ class OriginalDataset(data.Dataset):
 # val_list = make_datapath_list.make_datapath_list(val_rootpath, csv_name)
 # ## trans param
 # size = 224  #VGG16
-# mean = ([0.25, 0.25, 0.25])
+# mean = ([0.5, 0.5, 0.5])
 # std = ([0.5, 0.5, 0.5])
 # ## dataset
 # train_dataset = OriginalDataset(

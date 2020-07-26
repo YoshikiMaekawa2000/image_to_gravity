@@ -54,7 +54,7 @@ class data_transform():
 # ## trans param
 # size = 224  #VGG16
 # mean = ([0.5, 0.5, 0.5])
-# std = ([0.25, 0.25, 0.25])
+# std = ([0.5, 0.5, 0.5])
 # ## image
 # image_file_path = "..//dataset/example.jpg"
 # img = Image.open(image_file_path)

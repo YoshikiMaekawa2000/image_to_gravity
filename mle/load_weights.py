@@ -30,7 +30,7 @@ net.load_state_dict(load_weights)
 ## trans param
 size = 224  #VGG16
 mean_element = 0.5
-std_element = 0.25
+std_element = 0.5
 mean = ([mean_element, mean_element, mean_element])
 std = ([std_element, std_element, std_element])
 

@@ -80,7 +80,7 @@ class OriginalNet(nn.Module):
 # acc = np.array(g_list)
 # ## trans param
 # size = 224  #VGG16
-# mean = ([0.25, 0.25, 0.25])
+# mean = ([0.5, 0.5, 0.5])
 # std = ([0.5, 0.5, 0.5])
 # ## transform
 # transform = data_transform.data_transform(size, mean, std)
