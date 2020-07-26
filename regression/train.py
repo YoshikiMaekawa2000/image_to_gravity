@@ -80,7 +80,7 @@ def train_model(net, dataloaders_dict, criterion, optimizer, num_epochs, str_hyp
     plt.legend()
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
-    plt.title(str_hyperparameter)
+    plt.title("loss: train=" + str(record_loss_train[-1]) + ", val=" + str(record_loss_val[-1]))
     graph.savefig("../graph/" + str_hyperparameter + ".jpg")
     plt.show()
 
