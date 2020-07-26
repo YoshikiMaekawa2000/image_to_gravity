@@ -28,8 +28,10 @@ net.load_state_dict(load_weights)
 
 ## trans param
 size = 224  #VGG16
-mean = ([0.25, 0.25, 0.25])
-std = ([0.5, 0.5, 0.5])
+mean_element = 0.5
+std_element = 0.25
+mean = ([mean_element, mean_element, mean_element])
+std = ([std_element, std_element, std_element])
 
 ## list
 val_rootpath = "../dataset/val"

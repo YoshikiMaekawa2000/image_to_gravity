@@ -88,8 +88,8 @@ def train_model(net, dataloaders_dict, criterion, optimizer, num_epochs, str_hyp
 
 ##### execution #####
 ## hyperparameter
-mean_element = 0.25
-std_element = 0.5
+mean_element = 0.5
+std_element = 0.25
 str_optimizer = "Adam"
 lr0 = 1e-5
 lr1 = 1e-4
