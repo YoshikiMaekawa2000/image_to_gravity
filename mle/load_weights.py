@@ -118,20 +118,13 @@ class Sample:
         print("e_r[deg]: ", self.error_r/math.pi*180.0, ", e_p[deg]: ", self.error_p/math.pi*180.0)
         print("mul_sigma: ", self.mul_sigma)
 
-def accToRPTest(acc):
-    r = math.atan2(acc[1], acc[2])
-    p = math.atan2(-acc[0], math.sqrt(acc[1]*acc[1] + acc[2]*acc[2]))
-    return r, p
-
 ## access each sample
 list_sample = []
-list_r = []
-list_p = []
-list_r_selected = []
-list_p_selected = []
+list_er = []
+list_ep = []
+list_er_selected = []
+list_ep_selected = []
 list_mul_sigma = []
-th_outlier_deg = 10.0
-th_outlier_sigma = 0.0001
 for i in range(len(list_img_path)):
     ## input
     sample = Sample(
@@ -145,13 +138,13 @@ for i in range(len(list_img_path)):
     list_sample.append(sample)
 
     ## append
-    list_r.append(abs(sample.error_r))
-    list_p.append(abs(sample.error_p))
+    list_er.append(abs(sample.error_r))
+    list_ep.append(abs(sample.error_p))
     list_mul_sigma.append(sample.mul_sigma)
 
     if sample.mul_sigma < th_outlier_sigma:
-        list_r_selected.append(abs(sample.error_r))
-        list_p_selected.append(abs(sample.error_p))
+        list_er_selected.append(abs(sample.error_r))
+        list_ep_selected.append(abs(sample.error_p))
 
 ## sort
 # sorted_indicies = np.argsort(list_mul_sigma)    #small->large
@@ -164,6 +157,8 @@ i = 0
 h = 5
 w = 10
 
+th_outlier_deg = 10.0
+th_outlier_sigma = 0.0001
 for sample in list_sample:
     ## print
     sample.PrintData()
@@ -190,14 +185,14 @@ for sample in list_sample:
         i = i + 1
 
 ## error
-list_r = np.array(list_r)
-list_p = np.array(list_p)
-print("---ave---\n e_r[deg]: ", list_r.mean()/math.pi*180.0, " e_p[deg]: ",  list_p.mean()/math.pi*180.0)
+list_er = np.array(list_er)
+list_ep = np.array(list_ep)
+print("---ave---\n e_r[deg]: ", list_er.mean()/math.pi*180.0, " e_p[deg]: ",  list_ep.mean()/math.pi*180.0)
 ## selected error
-list_r_selected = np.array(list_r_selected)
-list_p_selected = np.array(list_p_selected)
-print("---selected ave---\n e_r[deg]: ", list_r_selected.mean()/math.pi*180.0, " e_p[deg]: ",  list_p_selected.mean()/math.pi*180.0)
-print("list_r_selected.size = ", list_r_selected.size)
+list_er_selected = np.array(list_er_selected)
+list_ep_selected = np.array(list_ep_selected)
+print("---selected ave---\n e_r[deg]: ", list_er_selected.mean()/math.pi*180.0, " e_p[deg]: ",  list_ep_selected.mean()/math.pi*180.0)
+print("list_er_selected.size = ", list_er_selected.size)
 ## mul_sigma
 list_mul_sigma = np.array(list_mul_sigma)
 print("list_mul_sigma.mean() = ", list_mul_sigma.mean())
