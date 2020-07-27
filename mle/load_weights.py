@@ -154,7 +154,7 @@ for i in range(len(list_img_path)):
         list_p_selected.append(abs(sample.error_p))
 
 ## sort
-sorted_indicies = np.argsort(list_mul_sigma)    #small->large
+# sorted_indicies = np.argsort(list_mul_sigma)    #small->large
 sorted_indicies = np.argsort(list_mul_sigma)[::-1]  #large->small
 list_sample = [list_sample[index] for index in sorted_indicies]
 
