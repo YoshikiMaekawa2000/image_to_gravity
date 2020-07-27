@@ -35,6 +35,7 @@ mean = ([mean_element, mean_element, mean_element])
 std = ([std_element, std_element, std_element])
 
 ## list
+# val_rootpath = "../dataset/train"
 val_rootpath = "../dataset/val"
 csv_name = "imu_camera.csv"
 val_list = make_datapath_list.make_datapath_list(val_rootpath, csv_name)
@@ -50,7 +51,7 @@ val_dataset = original_dataset.OriginalDataset(
 )
 
 ## dataloader
-batch_size = 10
+batch_size = 25
 val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 ## mini-batch prediction
@@ -119,6 +120,8 @@ class Sample:
         print("mul_sigma: ", self.mul_sigma)
 
 ## access each sample
+th_outlier_deg = 10.0
+th_outlier_sigma = 0.0001
 list_sample = []
 list_er = []
 list_ep = []
@@ -157,8 +160,6 @@ i = 0
 h = 5
 w = 10
 
-th_outlier_deg = 10.0
-th_outlier_sigma = 0.0001
 for sample in list_sample:
     ## print
     sample.PrintData()
