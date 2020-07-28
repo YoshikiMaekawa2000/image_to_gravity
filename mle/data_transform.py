@@ -71,10 +71,10 @@ class data_transform():
 # img_trans_numpy = np.clip(img_trans_numpy, 0, 1)
 # print("img_trans_numpy.shape = ", img_trans_numpy.shape)
 # ## save
-# save_path = "../dataset/augmented_example.jpg"
-# img_pil = Image.fromarray(np.uint8(255*img_trans_numpy))
-# img_pil.save(save_path)
-# print("saved: ", save_path)
+# # save_path = "../dataset/augmented_example.jpg"
+# # img_pil = Image.fromarray(np.uint8(255*img_trans_numpy))
+# # img_pil.save(save_path)
+# # print("saved: ", save_path)
 # ## imshow
 # plt.figure()
 # plt.subplot(1, 2, 1)
