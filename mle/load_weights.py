@@ -141,13 +141,13 @@ for i in range(len(list_img_path)):
     list_sample.append(sample)
 
     ## append
-    list_er.append(abs(sample.error_r))
-    list_ep.append(abs(sample.error_p))
+    list_er.append(sample.error_r)
+    list_ep.append(sample.error_p)
     list_mul_sigma.append(sample.mul_sigma)
 
     if sample.mul_sigma < th_outlier_sigma:
-        list_er_selected.append(abs(sample.error_r))
-        list_ep_selected.append(abs(sample.error_p))
+        list_er_selected.append(sample.error_r)
+        list_ep_selected.append(sample.error_p)
 
 ## sort
 # sorted_indicies = np.argsort(list_mul_sigma)    #small->large
@@ -186,13 +186,16 @@ for sample in list_sample:
         i = i + 1
 
 ## error
+def computeMAE(x):
+    return np.mean(np.abs(x))
+
 list_er = np.array(list_er)
 list_ep = np.array(list_ep)
-print("---ave---\n e_r[deg]: ", list_er.mean()/math.pi*180.0, " e_p[deg]: ",  list_ep.mean()/math.pi*180.0)
+print("---ave---\n e_r[deg]: ", computeMAE(list_er)/math.pi*180.0, " e_p[deg]: ",  computeMAE(list_ep)/math.pi*180.0)
 ## selected error
 list_er_selected = np.array(list_er_selected)
 list_ep_selected = np.array(list_ep_selected)
-print("---selected ave---\n e_r[deg]: ", list_er_selected.mean()/math.pi*180.0, " e_p[deg]: ",  list_ep_selected.mean()/math.pi*180.0)
+print("---selected ave---\n e_r[deg]: ", computeMAE(list_er_selected)/math.pi*180.0, " e_p[deg]: ",  computeMAE(list_ep_selected)/math.pi*180.0)
 print("list_er_selected.size = ", list_er_selected.size)
 ## mul_sigma
 list_mul_sigma = np.array(list_mul_sigma)
