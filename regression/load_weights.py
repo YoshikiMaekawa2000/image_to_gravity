@@ -34,10 +34,10 @@ mean = ([mean_element, mean_element, mean_element])
 std = ([std_element, std_element, std_element])
 
 ## list
-# val_rootpath = "../dataset/train"
-val_rootpath = "../dataset/val"
+# rootpath = "../dataset/train"
+rootpath = "../dataset/val"
 csv_name = "imu_camera.csv"
-val_list = make_datapath_list.make_datapath_list(val_rootpath, csv_name)
+val_list = make_datapath_list.make_datapath_list(rootpath, csv_name)
 
 ## transform
 transform = data_transform.data_transform(size, mean, std)
@@ -125,8 +125,8 @@ for i in range(len(list_img_path)):
     list_sample.append(sample)
 
     ## append
-    list_er.append(abs(sample.error_r))
-    list_ep.append(abs(sample.error_p))
+    list_er.append(sample.error_r)
+    list_ep.append(sample.error_p)
 
 ## sort
 list_sum_e_rp = [list_er[i] + list_ep[i] for i in range(len(list_er))]
@@ -163,8 +163,12 @@ for sample in list_sample:
         i = i + 1
 
 ## error
+def computeMAE(x):
+    return np.mean(np.abs(x))
+
 list_er = np.array(list_er)
 list_ep = np.array(list_ep)
-print("---ave---\n e_r[deg]: ", list_er.mean()/math.pi*180.0, " e_p[deg]: ",  list_ep.mean()/math.pi*180.0)
+print("---ave---\n e_r[deg]: ", computeMAE(list_er)/math.pi*180.0, " e_p[deg]: ",  computeMAE(list_ep)/math.pi*180.0)
+print("---var---\n v_r[deg]: ", np.var(list_er/math.pi*180.0), " v_p[deg]: ",  np.var(list_ep/math.pi*180.0))
 
 plt.show()
