@@ -35,10 +35,10 @@ mean = ([mean_element, mean_element, mean_element])
 std = ([std_element, std_element, std_element])
 
 ## list
-# val_rootpath = "../dataset/train"
-val_rootpath = "../dataset/val"
+# rootpath = "../dataset/train"
+rootpath = "../dataset/val"
 csv_name = "imu_camera.csv"
-val_list = make_datapath_list.make_datapath_list(val_rootpath, csv_name)
+val_list = make_datapath_list.make_datapath_list(rootpath, csv_name)
 
 ## transform
 transform = data_transform.data_transform(size, mean, std)
@@ -189,13 +189,16 @@ for sample in list_sample:
 def computeMAE(x):
     return np.mean(np.abs(x))
 
+## all
 list_er = np.array(list_er)
 list_ep = np.array(list_ep)
 print("---ave---\n e_r[deg]: ", computeMAE(list_er)/math.pi*180.0, " e_p[deg]: ",  computeMAE(list_ep)/math.pi*180.0)
-## selected error
+print("---var---\n v_r[deg]: ", np.var(list_er/math.pi*180.0), " v_p[deg]: ",  np.var(list_ep/math.pi*180.0))
+## selected
 list_er_selected = np.array(list_er_selected)
 list_ep_selected = np.array(list_ep_selected)
 print("---selected ave---\n e_r[deg]: ", computeMAE(list_er_selected)/math.pi*180.0, " e_p[deg]: ",  computeMAE(list_ep_selected)/math.pi*180.0)
+print("---selected var---\n v_r[deg]: ", np.var(list_er_selected/math.pi*180.0), " v_p[deg]: ",  np.var(list_ep_selected/math.pi*180.0))
 print("list_er_selected.size = ", list_er_selected.size)
 ## mul_sigma
 list_mul_sigma = np.array(list_mul_sigma)
