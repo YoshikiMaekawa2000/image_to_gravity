@@ -49,13 +49,13 @@ class OriginalNet(nn.Module):
         return list_cnn_param_value, list_fc_param_value
 
     def forward(self, x):
-        print("cnn-in", x.size())
+        # print("cnn-in", x.size())
         x = self.features(x)
-        print("cnn-out", x.size())
+        # print("cnn-out", x.size())
         x = torch.flatten(x, 1)
-        print("fc-in", x.size())
+        # print("fc-in", x.size())
         x = self.fc(x)
-        print("fc-out", x.size())
+        # print("fc-out", x.size())
         l2norm = torch.norm(x[:, :3].clone(), p=2, dim=1, keepdim=True)
         x[:, :3] = torch.div(x[:, :3].clone(), l2norm)  #L2Norm, |(gx, gy, gz)| = 1
         return x
