@@ -129,7 +129,7 @@ for i in range(len(list_img_path)):
     list_ep.append(sample.error_p)
 
 ## sort
-list_sum_e_rp = [list_er[i] + list_ep[i] for i in range(len(list_er))]
+list_sum_e_rp = [abs(list_er[i]) + abs(list_ep[i]) for i in range(len(list_er))]
 # sorted_indicies = np.argsort(list_sum_e_rp)    #small->large
 sorted_indicies = np.argsort(list_sum_e_rp)[::-1]  #large->small
 list_sample = [list_sample[index] for index in sorted_indicies]
