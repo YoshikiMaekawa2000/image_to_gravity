@@ -150,8 +150,11 @@ for i in range(len(list_img_path)):
         list_ep_selected.append(sample.error_p)
 
 ## sort
-# sorted_indicies = np.argsort(list_mul_sigma)    #small->large
-sorted_indicies = np.argsort(list_mul_sigma)[::-1]  #large->small
+list_sum_e_rp = [abs(list_er[i]) + abs(list_ep[i]) for i in range(len(list_er))]
+# sorted_indicies = np.argsort(list_sum_e_rp)   #error: small->large
+# sorted_indicies = np.argsort(list_sum_e_rp)[::-1]   #error: large->small
+# sorted_indicies = np.argsort(list_mul_sigma)  #variance: small->large
+sorted_indicies = np.argsort(list_mul_sigma)[::-1]  #variance: large->small
 list_sample = [list_sample[index] for index in sorted_indicies]
 
 ## print & imshow
