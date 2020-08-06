@@ -27,12 +27,12 @@ def originalCriterion(outputs, labels, device):
 
     dist = torch.distributions.MultivariateNormal(mu, scale_tril=L)
     loss = -dist.log_prob(labels)
-    for i in range(loss.size(0)):
-        if torch.isnan(loss[i]):
-            print("torch.isnan(loss[i]) = ", torch.isnan(loss[i]))
-            print("outputs[i] = ", outputs[i])
-            print("L[i] = ", L[i])
-            print("LL[i] = ", LL[i])
+    # for i in range(loss.size(0)):
+    #     if torch.isnan(loss[i]):
+    #         print("torch.isnan(loss[i]) = ", torch.isnan(loss[i]))
+    #         print("outputs[i] = ", outputs[i])
+    #         print("L[i] = ", L[i])
+    #         print("LL[i] = ", LL[i])
     loss = loss.mean()
     # print("loss = ", loss)
 
@@ -44,12 +44,12 @@ def getCovMatrix(outputs):
     LL = torch.bmm(L, Ltrans)
     return LL
 
-def computeDet(m):
-    det = \
-        m[:, 0, 0] * (m[:, 1, 1] * m[:, 2, 2] - m[:, 1, 2] * m[:, 2, 1]) \
-        - (m[:, 0, 1] * (m[:, 1, 0] * m[:, 2, 2] - m[:, 1, 2] * m[:, 2, 0])) \
-        + (m[:, 0, 2] * (m[:, 1, 0] * m[:, 2, 1] - m[:, 1, 1] * m[:, 2, 0]))
-    return det
+# def computeDet(m):
+#     det = \
+#         m[:, 0, 0] * (m[:, 1, 1] * m[:, 2, 2] - m[:, 1, 2] * m[:, 2, 1]) \
+#         - (m[:, 0, 1] * (m[:, 1, 0] * m[:, 2, 2] - m[:, 1, 2] * m[:, 2, 0])) \
+#         + (m[:, 0, 2] * (m[:, 1, 0] * m[:, 2, 1] - m[:, 1, 1] * m[:, 2, 0]))
+#     return det
 
 ##### test #####
 # outputs = np.array([
