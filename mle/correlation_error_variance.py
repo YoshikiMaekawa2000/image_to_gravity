@@ -97,6 +97,7 @@ print("o_p_arr.shape = ", o_p_arr.shape)
 print("e_r_arr.shape = ", e_r_arr.shape)
 print("e_p_arr.shape = ", e_p_arr.shape)
 print("mul_sigma_arr.shape = ", mul_sigma_arr.shape)
+print("mul_sigma_arr.mean() = ", mul_sigma_arr.mean())
 
 num_steps = 101
 resolution_mul_sigma = 0.00001
