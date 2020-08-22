@@ -3,7 +3,7 @@
 This is just an example.
 ```bash
 $ cd ***/image_to_gravity/nvidia_docker1
-$ ./run
+$ ./run.sh
 $ cd mle
 $ python3 train.py
 ```
@@ -11,7 +11,7 @@ $ python3 train.py
 This is just an example.
 ```bash
 $ cd ***/image_to_gravity/nvidia_docker1
-$ ./run
+$ ./run.sh
 $ cd mle
 $ python3 load_weights.py
 ```
