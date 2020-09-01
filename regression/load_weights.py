@@ -54,13 +54,19 @@ batch_size = 25
 val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 ## mini-batch prediction
+loss_mean = 0.0
+criterion = nn.MSELoss()
 list_img_path = [data[3] for data in val_list]
 inputs_arr = np.empty(0)
 labels_arr = np.empty([0, 3])
 mu_arr = np.empty([0, 3])
 for inputs, labels in val_dataloader:
     inputs = inputs.to(device)
+    labels = labels.to(device)
     outputs = net(inputs)
+    ## loss
+    loss = criterion(outputs, labels)
+    loss_mean += loss.item() * inputs.size(0)
     ## tensor -> numpy
     inputs_arr = np.append(
         inputs_arr.reshape(-1, inputs.size(1), inputs.size(2), inputs.size(3)),
@@ -69,6 +75,7 @@ for inputs, labels in val_dataloader:
     )
     labels_arr = np.append(labels_arr, labels.cpu().detach().numpy(), axis=0)
     mu_arr = np.append(mu_arr, outputs[:, :3].cpu().detach().numpy(), axis=0)
+loss_mean = loss_mean / len(val_dataloader.dataset)
 
 print("inputs_arr.shape = ", inputs_arr.shape)
 print("mu_arr.shape = ", mu_arr.shape)
@@ -162,6 +169,8 @@ for sample in list_sample:
             plt.title(sample.index)
         i = i + 1
 
+## loss
+print("---loss--- \n loss_mean = ", loss_mean)
 ## error
 def computeMAE(x):
     return np.mean(np.abs(x))
