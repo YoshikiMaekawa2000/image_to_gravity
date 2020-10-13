@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageOps
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -27,6 +27,12 @@ class data_transform():
     def __call__(self, img, acc, phase="train"):
         if phase == "train":
         # if (phase == "train") or (phase == "val"):
+            ## mirror
+            is_mirror = bool(random.getrandbits(1))
+            if is_mirror:
+                img = ImageOps.mirror(img)
+                acc[1] = -acc[1]
+
             ## random
             angle_deg = random.uniform(-10.0, 10.0)
             angle_rad = angle_deg / 180 * math.pi
