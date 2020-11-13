@@ -5,16 +5,16 @@ import torch
 from torchvision import models
 import torch.nn as nn
 
-import data_transform
+class Network(nn.Module):
+    def __init__(self, resize, use_pretrained=True):
+        super(Network, self).__init__()
 
-class OriginalNet(nn.Module):
-    def __init__(self):
-        super(OriginalNet, self).__init__()
+        vgg = models.vgg16(pretrained=use_pretrained)
+        self.cnn = vgg.features
 
-        vgg = models.vgg16(pretrained=True)
-        self.features = vgg.features
+        num_fc_in_features = 512*(resize//32)*(resize//32)
         self.fc = nn.Sequential(
-            nn.Linear(25088, 100),
+            nn.Linear(num_fc_in_features, 100),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.1),
             nn.Linear(100, 18),
@@ -22,25 +22,20 @@ class OriginalNet(nn.Module):
             nn.Dropout(p=0.1),
             nn.Linear(18, 3)
         )
-        self.copyVggParam(vgg)
+        self.initializeWeights()
 
-    def copyVggParam(self, vgg):
-        list_vgg_param_name = []
-        for param_name, _ in vgg.named_parameters():
-            list_vgg_param_name.append(param_name)
-        for param_name, param_value in self.named_parameters():
-            if param_name in list_vgg_param_name:
-                # print("copy vgg: ", param_name)
-                vgg.state_dict()[param_name].requires_grad = True
-                self.state_dict()[param_name] = vgg.state_dict()[param_name]
+    def initializeWeights(self):
+        for m in self.fc.children():
+            if isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight)
 
     def getParamValueList(self):
         list_cnn_param_value = []
         list_fc_param_value = []
         for param_name, param_value in self.named_parameters():
             param_value.requires_grad = True
-            if "features" in param_name:
-                # print("features: ", param_name)
+            if "cnn" in param_name:
+                # print("cnn: ", param_name)
                 list_cnn_param_value.append(param_value)
             if "fc" in param_name:
                 # print("fc: ", param_name)
@@ -50,38 +45,35 @@ class OriginalNet(nn.Module):
         return list_cnn_param_value, list_fc_param_value
 
     def forward(self, x):
-        # print("cnn-in", x.size())
-        x = self.features(x)
-        # print("cnn-out", x.size())
+        x = self.cnn(x)
         x = torch.flatten(x, 1)
-        # print("fc-in", x.size())
         x = self.fc(x)
-        # print("fc-out", x.size())
         l2norm = torch.norm(x[:, :3].clone(), p=2, dim=1, keepdim=True)
         x[:, :3] = torch.div(x[:, :3].clone(), l2norm)  #L2Norm, |(gx, gy, gz)| = 1
         return x
 
 ##### test #####
-# ## network
-# net = OriginalNet()
-# print(net)
-# list_cnn_param_value, list_fc_param_value = net.getParamValueList()
-# # print(list_fc_param_value)
+# import data_transform_mod
 # ## image
-# image_file_path = "../dataset/example.jpg"
-# img = Image.open(image_file_path)
+# img_path = "../../../dataset_image_to_gravity/AirSim/example/camera_0.jpg"
+# img_pil = Image.open(img_path)
 # ## label
-# g_list = [0, 0, 1]
-# acc = np.array(g_list)
+# acc_list = [0, 0, 1]
+# acc_numpy = np.array(acc_list)
 # ## trans param
-# size = 224  #VGG16
+# resize = 224
 # mean = ([0.5, 0.5, 0.5])
 # std = ([0.5, 0.5, 0.5])
 # ## transform
-# transform = data_transform.data_transform(size, mean, std)
-# img_trans, _ = transform(img, acc, phase="train")
+# transform = data_transform_mod.DataTransform(resize, mean, std)
+# img_trans, _ = transform(img_pil, acc_numpy, phase="train")
+# ## network
+# net = Network(resize, use_pretrained=True)
+# print(net)
+# list_cnn_param_value, list_fc_param_value = net.getParamValueList()
 # ## prediction
 # inputs = img_trans.unsqueeze_(0)
 # print("inputs.size() = ", inputs.size())
 # outputs = net(inputs)
 # print("outputs.size() = ", outputs.size())
+# print("outputs = ", outputs)

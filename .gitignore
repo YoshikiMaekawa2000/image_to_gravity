@@ -1,6 +1,8 @@
-dataset
 weights/*
-runs
+logs
 graph/*
+save/*
+dataset
+trash
 
 !.gitkeep
