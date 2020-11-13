@@ -16,10 +16,23 @@ from common import make_datalist_mod
 from common import data_transform_mod
 from common import dataset_mod
 from common import network_mod
+import criterion_mod
+
+class Trainer(trainer_mod.Trainer):
+    def saveGraph(self, record_loss_train, record_loss_val):    #overwrite
+        graph = plt.figure()
+        plt.plot(range(len(record_loss_train)), record_loss_train, label="Training")
+        plt.plot(range(len(record_loss_val)), record_loss_val, label="Validation")
+        plt.legend()
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss [m/s^2]")
+        plt.title("loss: train=" + str(record_loss_train[-1]) + ", val=" + str(record_loss_val[-1]))
+        graph.savefig("../../graph/" + self.str_hyperparameter + ".jpg")
+        plt.show()
 
 def main():
     ## hyperparameters
-    method_name = "regression"
+    method_name = "mle"
     train_rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/train"
     val_rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/val"
     csv_name = "imu_camera.csv"
@@ -51,11 +64,12 @@ def main():
         phase="val"
     )
     ## network
-    net = network_mod.Network(resize, dim_fc_out=3, use_pretrained_vgg=True)
+    net = network_mod.Network(resize, dim_fc_out=9, use_pretrained_vgg=True)
     ## criterion
-    criterion = nn.MSELoss()
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    criterion = criterion_mod.Criterion(device)
     ## train
-    trainer = trainer_mod.Trainer(
+    trainer = Trainer(
         method_name,
         train_dataset, val_dataset,
         net, criterion,

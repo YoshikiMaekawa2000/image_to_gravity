@@ -6,21 +6,21 @@ from torchvision import models
 import torch.nn as nn
 
 class Network(nn.Module):
-    def __init__(self, resize, use_pretrained=True):
+    def __init__(self, resize, dim_fc_out=3, use_pretrained_vgg=True):
         super(Network, self).__init__()
 
-        vgg = models.vgg16(pretrained=use_pretrained)
+        vgg = models.vgg16(pretrained=use_pretrained_vgg)
         self.cnn = vgg.features
 
-        num_fc_in_features = 512*(resize//32)*(resize//32)
+        dim_fc_in = 512*(resize//32)*(resize//32)
         self.fc = nn.Sequential(
-            nn.Linear(num_fc_in_features, 100),
+            nn.Linear(dim_fc_in, 100),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.1),
             nn.Linear(100, 18),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.1),
-            nn.Linear(18, 3)
+            nn.Linear(18, dim_fc_out)
         )
         self.initializeWeights()
 
@@ -68,7 +68,7 @@ class Network(nn.Module):
 # transform = data_transform_mod.DataTransform(resize, mean, std)
 # img_trans, _ = transform(img_pil, acc_numpy, phase="train")
 # ## network
-# net = Network(resize, use_pretrained=True)
+# net = Network(resize, dim_fc_out=3, use_pretrained_vgg=True)
 # print(net)
 # list_cnn_param_value, list_fc_param_value = net.getParamValueList()
 # ## prediction

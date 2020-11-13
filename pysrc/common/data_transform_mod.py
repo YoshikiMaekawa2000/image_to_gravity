@@ -9,6 +9,9 @@ from torchvision import transforms
 
 class DataTransform():
     def __init__(self, resize, mean, std):
+        self.resize = resize
+        self.mean = mean
+        self.std = std
         self.img_transform = transforms.Compose([
             transforms.Resize(resize),
             transforms.CenterCrop(resize),
