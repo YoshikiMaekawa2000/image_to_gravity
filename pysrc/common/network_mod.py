@@ -22,7 +22,7 @@ class Network(nn.Module):
             nn.Dropout(p=0.1),
             nn.Linear(18, dim_fc_out)
         )
-        self.initializeWeights()
+        # self.initializeWeights()
 
     def initializeWeights(self):
         for m in self.fc.children():
