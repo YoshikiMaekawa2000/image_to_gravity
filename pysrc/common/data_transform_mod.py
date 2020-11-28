@@ -8,7 +8,7 @@ import torch
 from torchvision import transforms
 
 class DataTransform():
-    def __init__(self, resize, mean, std, hor_fov_deg):
+    def __init__(self, resize, mean, std, hor_fov_deg=-1):
         self.resize = resize
         self.mean = mean
         self.std = std
@@ -28,7 +28,8 @@ class DataTransform():
             if is_mirror:
                 img_pil, acc_numpy = self.mirror(img_pil, acc_numpy)
             ## homography
-            img_pil, acc_numpy = self.randomHomography(img_pil, acc_numpy)
+            if self.hor_fov_rad > 0:
+                img_pil, acc_numpy = self.randomHomography(img_pil, acc_numpy)
             ## rotation
             img_pil, acc_numpy = self.randomRotation(img_pil, acc_numpy)
         ## img: numpy -> tensor

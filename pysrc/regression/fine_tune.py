@@ -71,6 +71,7 @@ def main():
     resize = 112
     mean_element = 0.5
     std_element = 0.5
+    hor_fov_deg = 70
     optimizer_name = "Adam"  #"SGD" or "Adam"
     lr_cnn = 1e-6
     lr_fc = 1e-5
@@ -83,7 +84,8 @@ def main():
         transform=data_transform_mod.DataTransform(
             resize,
             ([mean_element, mean_element, mean_element]),
-            ([std_element, std_element, std_element])
+            ([std_element, std_element, std_element]),
+            hor_fov_deg=hor_fov_deg
         ),
         phase="train"
     )
@@ -92,7 +94,8 @@ def main():
         transform=data_transform_mod.DataTransform(
             resize,
             ([mean_element, mean_element, mean_element]),
-            ([std_element, std_element, std_element])
+            ([std_element, std_element, std_element]),
+            hor_fov_deg=hor_fov_deg
         ),
         phase="val"
     )
