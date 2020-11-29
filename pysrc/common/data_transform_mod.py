@@ -28,7 +28,7 @@ class DataTransform():
             if is_mirror:
                 img_pil, acc_numpy = self.mirror(img_pil, acc_numpy)
             ## homography
-            if self.hor_fov_rad > 0:
+            if 0 < self.hor_fov_rad < math.pi:
                 img_pil, acc_numpy = self.randomHomography(img_pil, acc_numpy)
             ## rotation
             img_pil, acc_numpy = self.randomRotation(img_pil, acc_numpy)
@@ -52,12 +52,15 @@ class DataTransform():
         # print("angle_rad/math.pi*180.0 = ", angle_rad/math.pi*180.0)
         ## image
         (cols, rows) = img_pil.size
+        ver_fov_rad = rows / cols * self.hor_fov_rad
         if angle_rad > 0:
             new_cols_uppwer = cols
-            new_cols_lower = new_cols_uppwer - 2 * rows * abs(math.tan(self.hor_fov_rad / 2)) * math.tan(angle_rad)
+            # new_cols_lower = new_cols_uppwer - 2 * rows * abs(math.tan(self.hor_fov_rad / 2)) * math.tan(angle_rad)
+            new_cols_lower = new_cols_uppwer - (2 * math.tan(self.hor_fov_rad / 2) * rows * math.tan(angle_rad)) / (1 + math.tan(ver_fov_rad / 2) * math.tan(angle_rad))
         else:
             new_cols_lower = cols
-            new_cols_uppwer = new_cols_lower + 2 * rows * abs(math.tan(self.hor_fov_rad / 2)) * math.tan(angle_rad)
+            # new_cols_uppwer = new_cols_lower + 2 * rows * abs(math.tan(self.hor_fov_rad / 2)) * math.tan(angle_rad)
+            new_cols_uppwer = new_cols_lower + (2 * math.tan(self.hor_fov_rad / 2) * rows * math.tan(angle_rad)) / (1 - math.tan(ver_fov_rad / 2) * math.tan(angle_rad))
         points_after = [((cols - new_cols_uppwer)//2, 0), ((cols + new_cols_uppwer)//2, 0), ((cols + new_cols_lower)//2, rows), ((cols - new_cols_lower)//2, rows)]
         points_before = [(0, 0), (cols, 0), (cols, rows), (0, rows)]
         coeffs = self.find_coeffs(points_after, points_before)
