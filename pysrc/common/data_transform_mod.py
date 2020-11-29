@@ -49,7 +49,7 @@ class DataTransform():
 
     def randomHomography(self, img_pil, acc_numpy):
         angle_rad = random.uniform(-10.0, 10.0) / 180.0 * math.pi
-        # print("angle_rad/math.pi*180.0 = ", angle_rad/math.pi*180.0)
+        # print("hom: angle_rad/math.pi*180.0 = ", angle_rad/math.pi*180.0)
         ## image
         (cols, rows) = img_pil.size
         ver_fov_rad = rows / cols * self.hor_fov_rad
@@ -57,6 +57,8 @@ class DataTransform():
             new_cols_uppwer = cols
             # new_cols_lower = new_cols_uppwer - 2 * rows * abs(math.tan(self.hor_fov_rad / 2)) * math.tan(angle_rad)
             new_cols_lower = new_cols_uppwer - (2 * math.tan(self.hor_fov_rad / 2) * rows * math.tan(angle_rad)) / (1 + math.tan(ver_fov_rad / 2) * math.tan(angle_rad))
+        elif angle_rad == 0:
+            return img_pil, acc_numpy
         else:
             new_cols_lower = cols
             # new_cols_uppwer = new_cols_lower + 2 * rows * abs(math.tan(self.hor_fov_rad / 2)) * math.tan(angle_rad)
@@ -79,18 +81,18 @@ class DataTransform():
         B = np.array(pb).reshape(8)
         res = np.dot(np.linalg.inv(A.T * A) * A.T, B)
         ret = np.array(res).reshape(8)
-        wk = []
-        for v in ret :
-            wk.append(round(v, 3))
-        #print("coeffs", wk)
-        (alpha,beta) = (wk[6]+1, wk[7]+1)
-        (x0,y0) = (wk[2], wk[5])
-        (x1,y1) = (round((wk[0]+x0)/alpha,3), round((wk[3]+y0)/alpha,3))
-        (x2,y2) = (round((wk[1]+x0)/beta,3), round((wk[4]+y0)/beta,3))
-        #print("alpha,beta", wk[6]+1,wk[7]+1, "x0,y0", wk[2],wk[5])
-        #print("x1,y1", x1, y1, "x2,y2", x2,y2)
-        #print("pa", pa)
-        #print("pb", pb)
+        # wk = []
+        # for v in ret :
+        #     wk.append(round(v, 3))
+        # print("coeffs", wk)
+        # (alpha,beta) = (wk[6]+1, wk[7]+1)
+        # (x0,y0) = (wk[2], wk[5])
+        # (x1,y1) = (round((wk[0]+x0)/alpha,3), round((wk[3]+y0)/alpha,3))
+        # (x2,y2) = (round((wk[1]+x0)/beta,3), round((wk[4]+y0)/beta,3))
+        # print("alpha,beta", wk[6]+1,wk[7]+1, "x0,y0", wk[2],wk[5])
+        # print("x1,y1", x1, y1, "x2,y2", x2,y2)
+        # print("pa", pa)
+        # print("pb", pb)
         return ret
 
     def rotateVectorPitch(self, acc_numpy, angle):
@@ -105,6 +107,7 @@ class DataTransform():
     def randomRotation(self, img_pil, acc_numpy):
         angle_deg = random.uniform(-10.0, 10.0)
         angle_rad = angle_deg / 180 * math.pi
+        # print("rot: angle_deg = ", angle_deg)
         ## image
         img_pil = img_pil.rotate(angle_deg)
         ## acc
@@ -125,7 +128,7 @@ class DataTransform():
 # img_path = "../../../dataset_image_to_gravity/AirSim/example/camera_0.jpg"
 # img_pil = Image.open(img_path)
 # ## label
-# acc_list = [1, 0, 0]
+# acc_list = [0, 0, 1]
 # acc_numpy = np.array(acc_list)
 # print("acc_numpy = ", acc_numpy)
 # ## trans param
@@ -134,7 +137,7 @@ class DataTransform():
 # std = ([0.5, 0.5, 0.5])
 # hor_fov_deg = 70
 # ## transform
-# transform = DataTransform(resize, mean, std, hor_fov_deg)
+# transform = DataTransform(resize, mean, std, hor_fov_deg=hor_fov_deg)
 # img_trans, acc_trans = transform(img_pil, acc_numpy, phase="train")
 # print("acc_trans = ", acc_trans)
 # ## tensor -> numpy
