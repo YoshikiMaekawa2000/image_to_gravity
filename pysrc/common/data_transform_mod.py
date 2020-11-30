@@ -51,20 +51,23 @@ class DataTransform():
         angle_rad = random.uniform(-10.0, 10.0) / 180.0 * math.pi
         # print("hom: angle_rad/math.pi*180.0 = ", angle_rad/math.pi*180.0)
         ## image
-        (cols, rows) = img_pil.size
-        ver_fov_rad = rows / cols * self.hor_fov_rad
+        (w, h) = img_pil.size
+        ver_fov_rad = h / w * self.hor_fov_rad
+        ## tilt
+        d = abs(h * math.sin(angle_rad))
+        large_h = h + 2 * d * math.tan(ver_fov_rad / 2)
+        small_h = h * math.cos(angle_rad) + d * math.tan(ver_fov_rad / 2)
+        large_w = w + 2 * d * math.tan(self.hor_fov_rad / 2)
+        small_w = w
+        ## scalling
+        shrunk_h = h * small_h / large_h
+        shrunk_w = w * small_w / large_w
+        ## transform
         if angle_rad > 0:
-            new_cols_uppwer = cols
-            # new_cols_lower = new_cols_uppwer - 2 * rows * abs(math.tan(self.hor_fov_rad / 2)) * math.tan(angle_rad)
-            new_cols_lower = new_cols_uppwer - (2 * math.tan(self.hor_fov_rad / 2) * rows * math.tan(angle_rad)) / (1 + math.tan(ver_fov_rad / 2) * math.tan(angle_rad))
-        elif angle_rad == 0:
-            return img_pil, acc_numpy
+            points_after = [(0, 0), (w, 0), ((w + shrunk_w)//2, shrunk_h), ((w - shrunk_w)//2, shrunk_h)]
         else:
-            new_cols_lower = cols
-            # new_cols_uppwer = new_cols_lower + 2 * rows * abs(math.tan(self.hor_fov_rad / 2)) * math.tan(angle_rad)
-            new_cols_uppwer = new_cols_lower + (2 * math.tan(self.hor_fov_rad / 2) * rows * math.tan(angle_rad)) / (1 - math.tan(ver_fov_rad / 2) * math.tan(angle_rad))
-        points_after = [((cols - new_cols_uppwer)//2, 0), ((cols + new_cols_uppwer)//2, 0), ((cols + new_cols_lower)//2, rows), ((cols - new_cols_lower)//2, rows)]
-        points_before = [(0, 0), (cols, 0), (cols, rows), (0, rows)]
+            points_after = [((w - shrunk_w)//2, h - shrunk_h), ((w + shrunk_w)//2, h - shrunk_h), (w, h), (0, h)]
+        points_before = [(0, 0), (w, 0), (w, h), (0, h)]
         coeffs = self.find_coeffs(points_after, points_before)
         img_pil = img_pil.transform(img_pil.size, Image.PERSPECTIVE, coeffs, Image.BILINEAR)
         ## acc
@@ -81,18 +84,6 @@ class DataTransform():
         B = np.array(pb).reshape(8)
         res = np.dot(np.linalg.inv(A.T * A) * A.T, B)
         ret = np.array(res).reshape(8)
-        # wk = []
-        # for v in ret :
-        #     wk.append(round(v, 3))
-        # print("coeffs", wk)
-        # (alpha,beta) = (wk[6]+1, wk[7]+1)
-        # (x0,y0) = (wk[2], wk[5])
-        # (x1,y1) = (round((wk[0]+x0)/alpha,3), round((wk[3]+y0)/alpha,3))
-        # (x2,y2) = (round((wk[1]+x0)/beta,3), round((wk[4]+y0)/beta,3))
-        # print("alpha,beta", wk[6]+1,wk[7]+1, "x0,y0", wk[2],wk[5])
-        # print("x1,y1", x1, y1, "x2,y2", x2,y2)
-        # print("pa", pa)
-        # print("pb", pb)
         return ret
 
     def rotateVectorPitch(self, acc_numpy, angle):
