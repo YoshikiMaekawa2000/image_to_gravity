@@ -13,25 +13,25 @@ class DataTransform():
         self.mean = mean
         self.std = std
         self.img_transform = transforms.Compose([
-            transforms.Resize(resize),
-            transforms.CenterCrop(resize),
+            # transforms.Resize(resize),
+            # transforms.CenterCrop(resize),
             transforms.ToTensor(),
-            transforms.Normalize(mean, std)
+            # transforms.Normalize(mean, std)
         ])
         self.hor_fov_rad = hor_fov_deg / 180.0 * math.pi
 
     def __call__(self, img_pil, acc_numpy, phase="train"):
         ## augemntation
         if phase == "train":
-            ## mirror
-            is_mirror = bool(random.getrandbits(1))
-            if is_mirror:
-                img_pil, acc_numpy = self.mirror(img_pil, acc_numpy)
+            # ## mirror
+            # is_mirror = bool(random.getrandbits(1))
+            # if is_mirror:
+            #     img_pil, acc_numpy = self.mirror(img_pil, acc_numpy)
             ## homography
             if 0 < self.hor_fov_rad < math.pi:
                 img_pil, acc_numpy = self.randomHomography(img_pil, acc_numpy)
-            ## rotation
-            img_pil, acc_numpy = self.randomRotation(img_pil, acc_numpy)
+            # ## rotation
+            # img_pil, acc_numpy = self.randomRotation(img_pil, acc_numpy)
         ## img: numpy -> tensor
         img_tensor = self.img_transform(img_pil)
         ## acc: numpy -> tensor
@@ -49,32 +49,55 @@ class DataTransform():
 
     def randomHomography(self, img_pil, acc_numpy):
         angle_rad = random.uniform(-10.0, 10.0) / 180.0 * math.pi
+        # angle_rad = 15 / 180.0 * math.pi
         # print("hom: angle_rad/math.pi*180.0 = ", angle_rad/math.pi*180.0)
         ## image
         (w, h) = img_pil.size
         ver_fov_rad = h / w * self.hor_fov_rad
-        ## tilt
-        d = abs(h * math.sin(angle_rad))
-        large_h = h + 2 * d * math.tan(ver_fov_rad / 2)
-        small_h = h * math.cos(angle_rad) + d * math.tan(ver_fov_rad / 2)
-        large_w = w + 2 * d * math.tan(self.hor_fov_rad / 2)
-        small_w = w
-        ## scalling
-        shrunk_h = h * small_h / large_h
-        shrunk_w = w * small_w / large_w
-        ## transform
+        # ## tilt
+        # d = abs(h * math.sin(angle_rad))
+        # large_h = h + 2 * d * math.tan(ver_fov_rad / 2)
+        # small_h = h * math.cos(angle_rad) + d * math.tan(ver_fov_rad / 2)
+        # large_w = w + 2 * d * math.tan(self.hor_fov_rad / 2)
+        # small_w = w
+        # ## scalling
+        # shrunk_h = h * small_h / large_h
+        # shrunk_w = w * small_w / large_w
+        # ## transform
+        # if angle_rad > 0:
+        #     points_after = [(0, 0), (w, 0), ((w + shrunk_w)//2, shrunk_h), ((w - shrunk_w)//2, shrunk_h)]
+        # else:
+        #     points_after = [((w - shrunk_w)//2, h - shrunk_h), ((w + shrunk_w)//2, h - shrunk_h), (w, h), (0, h)]
+        d = h / 2 / math.tan(ver_fov_rad / 2)
+        l = h / 2 / math.sin(ver_fov_rad / 2)
+        l_small = d / math.cos(ver_fov_rad / 2 - abs(angle_rad))
+        d_small = l_small * math.cos(ver_fov_rad / 2)
+        d_large = l * math.cos(ver_fov_rad / 2 - abs(angle_rad))
+        h_small = h / 2 - d * math.tan(ver_fov_rad / 2 - abs(angle_rad))
+        w_small = d / d_large * w
+        w_large =d / d_small * w
         if angle_rad > 0:
-            points_after = [(0, 0), (w, 0), ((w + shrunk_w)//2, shrunk_h), ((w - shrunk_w)//2, shrunk_h)]
+            points_before = [(0, h_small), (w, h_small), (0, h), (w, h)]
+            points_after = [((w - w_large) / 2, 0), ((w + w_large) / 2, 0), ((w - w_small) / 2, h - h_small), ((w + w_small) / 2, h - h_small)]
         else:
-            points_after = [((w - shrunk_w)//2, h - shrunk_h), ((w + shrunk_w)//2, h - shrunk_h), (w, h), (0, h)]
-        points_before = [(0, 0), (w, 0), (w, h), (0, h)]
+            points_before = [(0, 0), (w, 0), (0, h - h_small), (w, h - h_small)]
+            points_after = [((w - w_small) / 2, h_small), ((w + w_small) / 2, h_small), ((w - w_large) / 2, h), ((w + w_large) / 2, h)]
+        # d_upper = d - h / 2 * math.sin(angle_rad)
+        # d_lower = d + h / 2 * math.sin(angle_rad)
+        # h_upper = d / d_upper * h / 2 * math.cos(angle_rad)
+        # h_lower = - d / d_lower * h / 2 * math.cos(angle_rad)
+        # w_upper = 2 * d / d_upper * w
+        # w_lower = 2 * d / d_lower * w
+        # points_after = [((w - w_upper) / 2, h / 2 - h_upper), ((w + w_upper) / 2, h / 2 - h_upper), ((w - w_lower) / 2, h / 2 - h_lower), ((w + w_lower) / 2, h / 2 - h_lower)]
+        # print("points_before = ", points_before)
+        # print("points_after = ", points_after)
         coeffs = self.find_coeffs(points_after, points_before)
         img_pil = img_pil.transform(img_pil.size, Image.PERSPECTIVE, coeffs, Image.BILINEAR)
         ## acc
         acc_numpy = self.rotateVectorPitch(acc_numpy, -angle_rad)
         return img_pil, acc_numpy
 
-    ## copied from "http://stackoverflow.com/questions/14177744/how-does-perspective-transformation-work-in-pil"
+    ## copy-pasted from "http://stackoverflow.com/questions/14177744/how-does-perspective-transformation-work-in-pil"
     def find_coeffs(self, pa, pb):
         matrix = []
         for p1, p2 in zip(pa, pb):
@@ -119,7 +142,7 @@ class DataTransform():
 # img_path = "../../../dataset_image_to_gravity/AirSim/example/camera_0.jpg"
 # img_pil = Image.open(img_path)
 # ## label
-# acc_list = [0, 0, 1]
+# acc_list = [0, 0, -1]
 # acc_numpy = np.array(acc_list)
 # print("acc_numpy = ", acc_numpy)
 # ## trans param

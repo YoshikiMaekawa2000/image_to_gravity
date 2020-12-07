@@ -49,7 +49,7 @@ def main():
             resize,
             ([mean_element, mean_element, mean_element]),
             ([std_element, std_element, std_element]),
-            hor_fov_deg
+            hor_fov_deg=hor_fov_deg
         ),
         phase="val"
     )
