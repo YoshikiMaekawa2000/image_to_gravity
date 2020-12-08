@@ -130,9 +130,9 @@ class Trainer:
                 if phase == "train":
                     record_loss_train.append(epoch_loss)
                     writer.add_scalar("Loss/train", epoch_loss, epoch)
-                    for param_name, param_value in self.net.named_parameters():
-                        # print(param_name, ": ", param_value.grad.abs().mean())
-                        # writer.add_scalar("Gradient/" + param_name, param_value.grad.abs().mean(), epoch)
+                    # for param_name, param_value in self.net.named_parameters():
+                    #     # print(param_name, ": ", param_value.grad.abs().mean())
+                    #     writer.add_scalar("Gradient/" + param_name, param_value.grad.abs().mean(), epoch)
                 else:
                     record_loss_val.append(epoch_loss)
                     writer.add_scalar("Loss/val", epoch_loss, epoch)
