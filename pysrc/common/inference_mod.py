@@ -94,9 +94,6 @@ class Inference:
             self.list_inputs += list(inputs.cpu().detach().numpy())
             self.list_labels += labels.cpu().detach().numpy().tolist()
             self.list_outputs += outputs.cpu().detach().numpy().tolist()
-        ## average loss
-        loss_all = loss_all / len(self.dataloader.dataset)
-        print("Loss: {:.4f}".format(loss_all))
         ## compute error
         mae, var = self.computeAttitudeError()
         ## sort
@@ -108,6 +105,9 @@ class Inference:
         mins = (time.time() - start_clock) // 60
         secs = (time.time() - start_clock) % 60
         print ("inference time: ", mins, " [min] ", secs, " [sec]")
+        ## average loss
+        loss_all = loss_all / len(self.dataloader.dataset)
+        print("Loss: {:.4f}".format(loss_all))
         ## MAE & Var
         print("mae [deg] = ", mae)
         print("var [deg^2] = ", var)

@@ -23,7 +23,6 @@ def main():
     resize = 224
     mean_element = 0.5
     std_element = 0.5
-    hor_fov_deg = 70
     batch_size = 10
     weights_path = "../../weights/regression.pth"
     ## dataset
@@ -32,8 +31,7 @@ def main():
         transform=data_transform_mod.DataTransform(
             resize,
             ([mean_element, mean_element, mean_element]),
-            ([std_element, std_element, std_element]),
-            hor_fov_deg=hor_fov_deg
+            ([std_element, std_element, std_element])
         ),
         phase="val"
     )

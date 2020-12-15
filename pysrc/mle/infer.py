@@ -74,9 +74,6 @@ class Inference(inference_mod.Inference):
             self.list_outputs += outputs.cpu().detach().numpy().tolist()
             cov = self.criterion.getCovMatrix(outputs)
             self.list_cov += list(cov.cpu().detach().numpy())
-        ## average loss
-        loss_all = loss_all / len(self.dataloader.dataset)
-        print("Loss: {:.4f}".format(loss_all))
         ## compute error
         mae, var, ave_mul_sigma, selected_mae, selected_var = self.computeAttitudeError()
         ## sort
@@ -88,6 +85,9 @@ class Inference(inference_mod.Inference):
         mins = (time.time() - start_clock) // 60
         secs = (time.time() - start_clock) % 60
         print ("inference time: ", mins, " [min] ", secs, " [sec]")
+        ## average loss
+        loss_all = loss_all / len(self.dataloader.dataset)
+        print("Loss: {:.4f}".format(loss_all))
         ## MAE & Var
         print("mae [deg] = ", mae)
         print("var [deg^2] = ", var)

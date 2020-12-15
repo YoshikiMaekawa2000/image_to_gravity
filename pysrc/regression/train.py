@@ -26,7 +26,7 @@ def main():
     resize = 224
     mean_element = 0.5
     std_element = 0.5
-    hor_fov_deg = 70
+    hor_fov_deg = -1
     optimizer_name = "Adam"  #"SGD" or "Adam"
     lr_cnn = 1e-5
     lr_fc = 1e-4
