@@ -36,13 +36,14 @@ def main():
     train_rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/train"
     val_rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/val"
     csv_name = "imu_camera.csv"
-    resize = 112
+    resize = 224
     mean_element = 0.5
     std_element = 0.5
+    hor_fov_deg = 70
     optimizer_name = "Adam"  #"SGD" or "Adam"
     lr_cnn = 1e-5
     lr_fc = 1e-4
-    batch_size = 100
+    batch_size = 50
     num_epochs = 50
     ## dataset
     train_dataset = dataset_mod.OriginalDataset(
@@ -50,7 +51,8 @@ def main():
         transform=data_transform_mod.DataTransform(
             resize,
             ([mean_element, mean_element, mean_element]),
-            ([std_element, std_element, std_element])
+            ([std_element, std_element, std_element]),
+            hor_fov_deg=hor_fov_deg
         ),
         phase="train"
     )
@@ -59,7 +61,8 @@ def main():
         transform=data_transform_mod.DataTransform(
             resize,
             ([mean_element, mean_element, mean_element]),
-            ([std_element, std_element, std_element])
+            ([std_element, std_element, std_element]),
+            hor_fov_deg=hor_fov_deg
         ),
         phase="val"
     )
