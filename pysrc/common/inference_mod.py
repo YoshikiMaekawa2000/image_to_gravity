@@ -187,5 +187,6 @@ class Inference:
                 ## image
                 plt.subplot(h, w, i+1)
                 plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
-                plt.imshow(np.clip(sample.inputs.transpose((1, 2, 0)), 0, 1))
+                plt.imshow(plt.imshow(Image.open(sample.inputs_pat[0]))
+                # plt.imshow(np.clip(sample.inputs.transpose((1, 2, 0)), 0, 1))
                 plt.title(str(sample.index))
