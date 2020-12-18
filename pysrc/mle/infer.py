@@ -152,7 +152,7 @@ def main():
     ## hyperparameters
     rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/val"
     csv_name = "imu_camera.csv"
-    resize = 112
+    resize = 224
     mean_element = 0.5
     std_element = 0.5
     batch_size = 10
