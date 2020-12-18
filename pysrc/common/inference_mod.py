@@ -165,13 +165,27 @@ class Inference:
         self.list_samples = [self.list_samples[index] for index in sorted_indicies]
 
     def showResult(self):
+        visualize_gravity = True
         plt.figure()
-        h = 5
+        h = 2
         w = 5
-        for i in range(len(self.list_samples)):
-            self.list_samples[i].printData()
-            if i < h*w:
+        num_shown = h*w
+        if visualize_gravity:
+            h = 2*h
+        for i, sample in enumerate(self.list_samples):
+            sample.printData()
+            if i < num_shown:
+                ## gravity 
+                if visualize_gravity:
+                    i = i + w*(i//w)
+                    fig = plt.subplot(h, w, i+1+w)
+                    fig.set_xlim(-1, 1)
+                    fig.set_ylim(-1, 1)
+                    fig.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
+                    fig.quiver(-sample.label[1], -sample.label[2], color='blue', angles='xy', scale_units='xy', scale=1)
+                    fig.quiver(-sample.mu[1], -sample.mu[2], color='red', angles='xy', scale_units='xy', scale=1)
+                ## image
                 plt.subplot(h, w, i+1)
                 plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
-                plt.imshow(self.list_samples[i].inputs.transpose((1, 2, 0)))
-                plt.title(str(self.list_samples[i].index))
+                plt.imshow(np.clip(sample.inputs.transpose((1, 2, 0)), 0, 1))
+                plt.title(str(sample.index))
