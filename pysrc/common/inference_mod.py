@@ -3,6 +3,7 @@ import numpy as np
 import math
 from tqdm import tqdm
 import time
+from PIL import Image
 
 import torch
 from torchvision import models
@@ -187,6 +188,6 @@ class Inference:
                 ## image
                 plt.subplot(h, w, i+1)
                 plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
-                plt.imshow(plt.imshow(Image.open(sample.inputs_pat[0]))
+                plt.imshow(Image.open(sample.inputs_path[0]))
                 # plt.imshow(np.clip(sample.inputs.transpose((1, 2, 0)), 0, 1))
                 plt.title(str(sample.index))

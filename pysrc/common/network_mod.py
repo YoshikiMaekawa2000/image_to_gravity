@@ -1,6 +1,3 @@
-from PIL import Image
-import numpy as np
-
 import torch
 from torchvision import models
 import torch.nn as nn
@@ -10,7 +7,7 @@ class Network(nn.Module):
         super(Network, self).__init__()
 
         vgg = models.vgg16(pretrained=use_pretrained_vgg)
-        self.cnn = vgg.features
+        self.cnn = vgg.cnn
 
         dim_fc_in = 512*(resize//32)*(resize//32)
         self.fc = nn.Sequential(
@@ -53,6 +50,8 @@ class Network(nn.Module):
         return x
 
 ##### test #####
+# from PIL import Image
+# import numpy as np
 # import data_transform_mod
 # ## image
 # img_path = "../../../dataset_image_to_gravity/AirSim/example/camera_0.jpg"

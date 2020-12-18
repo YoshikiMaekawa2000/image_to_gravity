@@ -119,7 +119,7 @@ class Inference(inference_mod.Inference):
             ## register
             sample = Sample(
                 i,
-                self.dataloader.dataset.data_list[i][3:], self.list_inputs[i], self.list_labels[i], self.list_outputs[i, :3], self.list_cov[i], mul_sigma,
+                self.dataloader.dataset.data_list[i][3:], self.list_inputs[i], self.list_labels[i], self.list_outputs[i][:3], self.list_cov[i], mul_sigma,
                 label_r, label_p, output_r, output_p, error_r, error_p
             )
             self.list_samples.append(sample)
