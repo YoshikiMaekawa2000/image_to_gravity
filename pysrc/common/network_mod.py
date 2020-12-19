@@ -7,7 +7,7 @@ class Network(nn.Module):
         super(Network, self).__init__()
 
         vgg = models.vgg16(pretrained=use_pretrained_vgg)
-        self.cnn = vgg.cnn
+        self.cnn = vgg.features
 
         dim_fc_in = 512*(resize//32)*(resize//32)
         self.fc = nn.Sequential(
