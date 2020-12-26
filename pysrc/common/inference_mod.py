@@ -183,8 +183,8 @@ class Inference:
                     fig.set_xlim(-1, 1)
                     fig.set_ylim(-1, 1)
                     fig.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
-                    fig.quiver(-sample.label[1], -sample.label[2], color='blue', angles='xy', scale_units='xy', scale=1)
-                    fig.quiver(-sample.mu[1], -sample.mu[2], color='red', angles='xy', scale_units='xy', scale=1)
+                    fig.quiver(sample.label[1], -sample.label[2], color='blue', angles='xy', scale_units='xy', scale=1)
+                    fig.quiver(sample.mu[1], -sample.mu[2], color='red', angles='xy', scale_units='xy', scale=1)
                 ## image
                 plt.subplot(h, w, i+1)
                 plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
