@@ -65,8 +65,8 @@ class FineTuner(trainer_mod.Trainer):
 def main():
     ## hyperparameters
     method_name = "regression"
-    train_rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/train"
-    val_rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/val"
+    list_train_rootpath = ["../../../dataset_image_to_gravity/AirSim/1cam/train"]
+    list_val_rootpath = ["../../../dataset_image_to_gravity/AirSim/1cam/val"]
     csv_name = "imu_camera.csv"
     resize = 224
     mean_element = 0.5
@@ -80,7 +80,7 @@ def main():
     weights_path = "../../weights/regression.pth"
     ## dataset
     train_dataset = dataset_mod.OriginalDataset(
-        data_list=make_datalist_mod.makeDataList(train_rootpath, csv_name),
+        data_list=make_datalist_mod.makeDataList(list_train_rootpath, csv_name),
         transform=data_transform_mod.DataTransform(
             resize,
             ([mean_element, mean_element, mean_element]),
@@ -90,7 +90,7 @@ def main():
         phase="train"
     )
     val_dataset = dataset_mod.OriginalDataset(
-        data_list=make_datalist_mod.makeDataList(val_rootpath, csv_name),
+        data_list=make_datalist_mod.makeDataList(list_val_rootpath, csv_name),
         transform=data_transform_mod.DataTransform(
             resize,
             ([mean_element, mean_element, mean_element]),

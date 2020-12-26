@@ -150,7 +150,7 @@ class Inference(inference_mod.Inference):
 
 def main():
     ## hyperparameters
-    rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/val"
+    list_rootpath = ["../../../dataset_image_to_gravity/AirSim/1cam/val"]
     csv_name = "imu_camera.csv"
     resize = 224
     mean_element = 0.5
@@ -160,7 +160,7 @@ def main():
     th_mul_sigma = 0.0001
     ## dataset
     dataset = dataset_mod.OriginalDataset(
-        data_list=make_datalist_mod.makeDataList(rootpath, csv_name),
+        data_list=make_datalist_mod.makeDataList(list_rootpath, csv_name),
         transform=data_transform_mod.DataTransform(
             resize,
             ([mean_element, mean_element, mean_element]),

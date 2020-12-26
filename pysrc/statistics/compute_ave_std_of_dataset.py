@@ -7,9 +7,9 @@ sys.path.append('../')
 from common import make_datalist_mod
 
 class StatisticsModel:
-    def __init__(self, rootpath, csv_name):
+    def __init__(self, list_rootpath, csv_name):
         ## list
-        self.list_data = make_datalist_mod.makeDataList(rootpath, csv_name)
+        self.list_data = make_datalist_mod.makeDataList(list_rootpath, csv_name)
         self.list_error_rp = []
 
     def __call__(self):
@@ -54,10 +54,10 @@ class StatisticsModel:
 
 def main():
     ## hyperparameters
-    rootpath = "../../../dataset_image_to_gravity/AirSim/lidar1cam/val"
+    list_rootpath = ["../../../dataset_image_to_gravity/AirSim/lidar1cam/val"]
     csv_name = "imu_lidar_camera.csv"
     ## procrss
-    statistics_model = StatisticsModel(rootpath, csv_name)
+    statistics_model = StatisticsModel(list_rootpath, csv_name)
     statistics_model()
 
 if __name__ == '__main__':

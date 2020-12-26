@@ -29,11 +29,11 @@ class OriginalDataset(data.Dataset):
 # import make_datalist_mod
 # import data_transform_mod
 # ## list
-# train_rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/train"
-# val_rootpath = "../../../dataset_image_to_gravity/AirSim/1cam/val"
+# list_train_rootpath = ["../../../dataset_image_to_gravity/AirSim/1cam/train"]
+# list_val_rootpath = ["../../../dataset_image_to_gravity/AirSim/1cam/val"]
 # csv_name = "imu_camera.csv"
-# train_list = make_datalist_mod.makeDataList(train_rootpath, csv_name)
-# val_list = make_datalist_mod.makeDataList(val_rootpath, csv_name)
+# train_list = make_datalist_mod.makeDataList(list_train_rootpath, csv_name)
+# val_list = make_datalist_mod.makeDataList(list_val_rootpath, csv_name)
 # ## trans param
 # resize = 224
 # mean = ([0.5, 0.5, 0.5])
