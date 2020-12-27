@@ -185,7 +185,7 @@ class Inference:
                     fig.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
                     fig.quiver(-0.5, 0, color='green', angles='xy', scale_units='xy', scale=1)
                     fig.quiver(0, 0.5, color='blue', angles='xy', scale_units='xy', scale=1)
-                    fig.quiver(sample.label[1], -sample.label[2], color='aqua', angles='xy', scale_units='xy', scale=1)
+                    fig.quiver(sample.label[1], -sample.label[2], color='deepskyblue', angles='xy', scale_units='xy', scale=1)
                     fig.quiver(sample.mu[1], -sample.mu[2], color='magenta', angles='xy', scale_units='xy', scale=1)
                 ## image
                 plt.subplot(h, w, i+1)
