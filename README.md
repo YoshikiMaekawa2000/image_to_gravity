@@ -1,4 +1,7 @@
 # image_to_gravity
+## Overview
+This repository presents a deep neural network which estimates a gravity direction from a single shot.
+![overview](https://user-images.githubusercontent.com/37431972/107804047-c7dbc680-6da6-11eb-8035-eb043a23dd01.png)
 ## Datasets
 Some datasets are available at [ozakiryota/dataset_image_to_gravity](https://github.com/ozakiryota/dataset_image_to_gravity).
 ## Usage
@@ -40,4 +43,6 @@ $ python3 infer.py
 Preparing...
 ## Citation
 If this repository helps your research, please cite the paper below.  
+```
 Preparing...
+```
