@@ -12,13 +12,13 @@ import torch.nn as nn
 class Sample:
     def __init__(self,
             index,
-            inputs_path, inputs, label, mu,
+            inputs_path, inputs, label, mean,
             label_r, label_p, output_r, output_p, error_r, error_p):
         self.index = index              #int
         self.inputs_path = inputs_path  #list
         self.inputs = inputs            #ndarray
         self.label = label              #list
-        self.mu = mu                    #list
+        self.mean = mean                #list
         self.label_r = label_r          #float
         self.label_p = label_p          #float
         self.output_r = output_r        #float
@@ -32,7 +32,7 @@ class Sample:
         # print("inputs: ", self.inputs)
         print("inputs.shape: ", self.inputs.shape)
         print("label: ", self.label)
-        print("mu: ", self.mu)
+        print("mean: ", self.mean)
         print("l_r[deg]: ", self.label_r/math.pi*180.0, ", l_p[deg]: ", self.label_p/math.pi*180.0)
         print("o_r[deg]: ", self.output_r/math.pi*180.0, ", o_p[deg]: ", self.output_p/math.pi*180.0)
         print("e_r[deg]: ", self.error_r/math.pi*180.0, ", e_p[deg]: ", self.error_p/math.pi*180.0)
@@ -83,7 +83,6 @@ class Inference:
         for inputs, labels in tqdm(self.dataloader):
             inputs = inputs.to(self.device)
             labels = labels.to(self.device)
-            ## compute gradient
             with torch.set_grad_enabled(False):
                 ## forward
                 outputs = self.net(inputs)
@@ -186,7 +185,7 @@ class Inference:
                     fig.quiver(-0.5, 0, color='green', angles='xy', scale_units='xy', scale=1)
                     fig.quiver(0, 0.5, color='blue', angles='xy', scale_units='xy', scale=1)
                     fig.quiver(sample.label[1], -sample.label[2], color='deepskyblue', angles='xy', scale_units='xy', scale=1)
-                    fig.quiver(sample.mu[1], -sample.mu[2], color='magenta', angles='xy', scale_units='xy', scale=1)
+                    fig.quiver(sample.mean[1], -sample.mean[2], color='magenta', angles='xy', scale_units='xy', scale=1)
                 ## image
                 plt.subplot(h, w, i+1)
                 plt.tick_params(labelbottom=False, labelleft=False, bottom=False, left=False)
