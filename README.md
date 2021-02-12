@@ -46,3 +46,6 @@ If this repository helps your research, please cite the paper below.
 ```
 Preparing...
 ```
+The implementation used when it was published is available at Commit [2f66928](https://github.com/ozakiryota/image_to_gravity/tree/6ea94711b5ea6b7340856cf30a142b19d64b04d7).
+## Related repositories
+Preparing...
