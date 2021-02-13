@@ -156,8 +156,8 @@ class Inference(inference_mod.Inference):
         ## get indicies
         # sorted_indicies = np.argsort(list_sum_error_rp)         #error: small->large
         # sorted_indicies = np.argsort(list_sum_error_rp)[::-1]   #error: large->small
-        # sorted_indicies = np.argsort(self.list_std_dist)        #sigma: small->large
-        sorted_indicies = np.argsort(self.list_std_dist)[::-1]  #sigma: large->small
+        sorted_indicies = np.argsort(self.list_std_dist)        #sigma: small->large
+        # sorted_indicies = np.argsort(self.list_std_dist)[::-1]  #sigma: large->small
         ## sort
         self.list_samples = [self.list_samples[index] for index in sorted_indicies]
 
