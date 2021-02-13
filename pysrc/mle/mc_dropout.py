@@ -92,7 +92,7 @@ class Inference(inference_mod.Inference):
                 cov = np.array([[1, 0.5, 0.5], [0.5, 1, 0.5], [0.5, 0.5, 1]]) * cov
                 self.list_cov.append(cov)
         ## compute error
-        mae, var, ave_std_dist, selected_mae, selected_var = self.computeAttitudeError()
+        mae, var, ave_std_dist, selected_mae, selected_var, weighted_mae = self.computeAttitudeError()
         ## sort
         self.sortSamples()
         ## show result & set graph
@@ -112,6 +112,7 @@ class Inference(inference_mod.Inference):
         print("#selected samples = ", len(self.list_selected_samples), " / ", len(self.list_samples))
         print("selected mae [deg] = ", selected_mae)
         print("selected var [deg^2] = ", selected_var)
+        print("weighted mae [deg] = ", weighted_mae)
         ## graph
         plt.tight_layout()
         plt.show()
@@ -141,15 +142,14 @@ class Inference(inference_mod.Inference):
             if std_dist < self.th_std_dist:
                 self.list_selected_samples.append(sample)
                 list_selected_errors.append([error_r, error_p])
-        arr_errors = np.array(list_errors)
-        arr_selected_errors = np.array(list_selected_errors)
-        print("arr_errors.shape = ", arr_errors.shape)
-        mae = self.computeMAE(arr_errors/math.pi*180.0)
-        var = self.computeVar(arr_errors/math.pi*180.0)
+        mae = self.computeMAE(np.array(list_errors)/math.pi*180.0)
+        var = self.computeVar(np.array(list_errors)/math.pi*180.0)
         ave_std_dist = np.mean(self.list_std_dist, axis=0)
-        selected_mae = self.computeMAE(arr_selected_errors/math.pi*180.0)
-        selected_var = self.computeVar(arr_selected_errors/math.pi*180.0)
-        return mae, var, ave_std_dist, selected_mae, selected_var
+        selected_mae = self.computeMAE(np.array(list_selected_errors)/math.pi*180.0)
+        selected_var = self.computeVar(np.array(list_selected_errors)/math.pi*180.0)
+        list_weighted_error = list(np.array(list_errors)/math.pi*180.0 * (1/np.array(self.list_std_dist)[:, np.newaxis]))
+        weighted_mae = np.sum(np.abs(list_weighted_error), axis=0) / np.sum(1/np.array(self.list_std_dist))
+        return mae, var, ave_std_dist, selected_mae, selected_var, weighted_mae
 
     def sortSamples(self):  #overwrite
         list_sum_error_rp = [abs(sample.error_r) + abs(sample.error_p) for sample in self.list_samples]
