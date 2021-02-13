@@ -51,7 +51,6 @@ class Inference(inference_mod.Inference):
         self.th_std_dist = th_std_dist
         ## list
         self.list_selected_samples = []
-        self.list_mean = []
         self.list_cov = []
         self.list_std_dist = []
         ## set
@@ -82,7 +81,7 @@ class Inference(inference_mod.Inference):
             ## append
             self.list_inputs += list(inputs.cpu().detach().numpy())
             self.list_labels += labels.cpu().detach().numpy().tolist()
-            self.list_mean += np.array(list_outputs).mean(0).tolist()
+            self.list_est += np.array(list_outputs).mean(0).tolist()
             for outputs in list(np.array(list_outputs).transpose(1, 0, 2)):
                 self.list_cov.append(np.cov(outputs, rowvar=False, bias=True))
         ## compute error
@@ -116,7 +115,7 @@ class Inference(inference_mod.Inference):
         for i in range(len(self.list_labels)):
             ## error
             label_r, label_p = self.accToRP(self.list_labels[i])
-            output_r, output_p = self.accToRP(self.list_mean[i])
+            output_r, output_p = self.accToRP(self.list_est[i])
             error_r = self.computeAngleDiff(output_r, label_r)
             error_p = self.computeAngleDiff(output_p, label_p)
             list_errors.append([error_r, error_p])
@@ -127,7 +126,7 @@ class Inference(inference_mod.Inference):
             sample = Sample(
                 i,
                 self.dataloader.dataset.data_list[i][3:], self.list_inputs[i], self.list_labels[i],
-                self.list_mean[i], self.list_cov[i], std_dist,
+                self.list_est[i], self.list_cov[i], std_dist,
                 label_r, label_p, output_r, output_p, error_r, error_p
             )
             self.list_samples.append(sample)

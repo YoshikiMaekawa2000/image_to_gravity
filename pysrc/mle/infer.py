@@ -72,7 +72,7 @@ class Inference(inference_mod.Inference):
             ## append
             self.list_inputs += list(inputs.cpu().detach().numpy())
             self.list_labels += labels.cpu().detach().numpy().tolist()
-            self.list_outputs += outputs.cpu().detach().numpy().tolist()
+            self.list_est += outputs.cpu().detach().numpy()[:, :3].tolist()
             cov = self.criterion.getCovMatrix(outputs)
             self.list_cov += list(cov.cpu().detach().numpy())
         ## compute error
@@ -109,7 +109,7 @@ class Inference(inference_mod.Inference):
         for i in range(len(self.list_labels)):
             ## error
             label_r, label_p = self.accToRP(self.list_labels[i])
-            output_r, output_p = self.accToRP(self.list_outputs[i])
+            output_r, output_p = self.accToRP(self.list_est[i])
             error_r = self.computeAngleDiff(output_r, label_r)
             error_p = self.computeAngleDiff(output_p, label_p)
             list_errors.append([error_r, error_p])
@@ -119,7 +119,7 @@ class Inference(inference_mod.Inference):
             ## register
             sample = Sample(
                 i,
-                self.dataloader.dataset.data_list[i][3:], self.list_inputs[i], self.list_labels[i], self.list_outputs[i][:3], self.list_cov[i], mul_std,
+                self.dataloader.dataset.data_list[i][3:], self.list_inputs[i], self.list_labels[i], self.list_est[i], self.list_cov[i], mul_std,
                 label_r, label_p, output_r, output_p, error_r, error_p
             )
             self.list_samples.append(sample)
