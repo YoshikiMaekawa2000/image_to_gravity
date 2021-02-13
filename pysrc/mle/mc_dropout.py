@@ -15,6 +15,7 @@ from common import make_datalist_mod
 from common import data_transform_mod
 from common import dataset_mod
 from common import network_mod
+import criterion_mod
 
 class Sample(inference_mod.Sample):
     def __init__(self,
@@ -69,21 +70,27 @@ class Inference(inference_mod.Inference):
         for inputs, labels in tqdm(self.dataloader):
             inputs = inputs.to(self.device)
             labels = labels.to(self.device)
-            list_outputs = []
+            list_mean = []
+            list_cov_mle = []
             with torch.set_grad_enabled(False):
                 for _ in range(self.num_mcsampling):
                     ## forward
                     outputs = self.net(inputs)
                     loss_batch = self.computeLoss(outputs, labels)
                     ## add
-                    list_outputs.append(outputs.cpu().detach().numpy())
+                    list_mean.append(outputs.cpu().detach().numpy()[:, :3])
+                    list_cov_mle.append(self.criterion.getCovMatrix(outputs).cpu().detach().numpy())
                     loss_all += loss_batch.item() * inputs.size(0)
             ## append
             self.list_inputs += list(inputs.cpu().detach().numpy())
             self.list_labels += labels.cpu().detach().numpy().tolist()
-            self.list_est += np.array(list_outputs).mean(0).tolist()
-            for outputs in list(np.array(list_outputs).transpose(1, 0, 2)):
-                self.list_cov.append(np.cov(outputs, rowvar=False, bias=True))
+            self.list_est += np.array(list_mean).mean(0).tolist()
+            list_cov_mle = list(np.array(list_cov_mle).mean(0))
+            for i, mean in enumerate(list(np.array(list_mean).transpose(1, 0, 2))):
+                cov_mc = np.cov(mean, rowvar=False, bias=True)
+                cov = list_cov_mle[i] + cov_mc
+                cov = np.array([[1, 0.5, 0.5], [0.5, 1, 0.5], [0.5, 0.5, 1]]) * cov
+                self.list_cov.append(cov)
         ## compute error
         mae, var, ave_std_dist, selected_mae, selected_var = self.computeAttitudeError()
         ## sort
@@ -149,8 +156,8 @@ class Inference(inference_mod.Inference):
         ## get indicies
         # sorted_indicies = np.argsort(list_sum_error_rp)         #error: small->large
         # sorted_indicies = np.argsort(list_sum_error_rp)[::-1]   #error: large->small
-        sorted_indicies = np.argsort(self.list_std_dist)        #sigma: small->large
-        # sorted_indicies = np.argsort(self.list_std_dist)[::-1]  #sigma: large->small
+        # sorted_indicies = np.argsort(self.list_std_dist)        #sigma: small->large
+        sorted_indicies = np.argsort(self.list_std_dist)[::-1]  #sigma: large->small
         ## sort
         self.list_samples = [self.list_samples[index] for index in sorted_indicies]
 
@@ -162,9 +169,9 @@ def main():
     mean_element = 0.5
     std_element = 0.5
     batch_size = 10
-    weights_path = "../../weights/regression.pth"
+    weights_path = "../../weights/mle.pth"
     num_mcsampling = 50
-    th_std_dist = 0.05
+    th_std_dist = 0.2
     ## dataset
     dataset = dataset_mod.OriginalDataset(
         data_list=make_datalist_mod.makeDataList(list_rootpath, csv_name),
@@ -176,9 +183,10 @@ def main():
         phase="val"
     )
     ## network
-    net = network_mod.Network(resize, dim_fc_out=3, use_pretrained_vgg=False)
+    net = network_mod.Network(resize, dim_fc_out=9, use_pretrained_vgg=False)
     ## criterion
-    criterion = nn.MSELoss()
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    criterion = criterion_mod.Criterion(device)
     ## infer
     inference = Inference(
         dataset,
