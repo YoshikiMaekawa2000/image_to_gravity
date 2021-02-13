@@ -20,19 +20,19 @@ class Sample(inference_mod.Sample):
     def __init__(self,
             index,
             inputs_path, inputs, label,
-            mean, var, std_dist,
+            mean, cov, std_dist,
             label_r, label_p, output_r, output_p, error_r, error_p):
         super(Sample, self).__init__(
             index,
             inputs_path, inputs, label, mean,
             label_r, label_p, output_r, output_p, error_r, error_p
         )
-        self.var = var              #list
+        self.cov = cov              #ndarray
         self.std_dist = std_dist    #float
 
     def printData(self):
         super(Sample, self).printData()
-        print("var[m^2/s^4]: ", self.var)
+        print("cov[m^2/s^4]: \n", self.cov)
         print("std_dist[m/s^2]: ", self.std_dist)
 
 class Inference(inference_mod.Inference):
@@ -52,7 +52,7 @@ class Inference(inference_mod.Inference):
         ## list
         self.list_selected_samples = []
         self.list_mean = []
-        self.list_var = []
+        self.list_cov = []
         self.list_std_dist = []
         ## set
         self.enable_dropout()
@@ -70,22 +70,21 @@ class Inference(inference_mod.Inference):
         for inputs, labels in tqdm(self.dataloader):
             inputs = inputs.to(self.device)
             labels = labels.to(self.device)
+            list_outputs = []
             with torch.set_grad_enabled(False):
-                list_outputs = []
                 for _ in range(self.num_sampling):
                     ## forward
                     outputs = self.net(inputs)
                     loss_batch = self.computeLoss(outputs, labels)
                     ## add
-                    list_outputs.append(outputs.unsqueeze(0))
+                    list_outputs.append(outputs.cpu().detach().numpy())
                     loss_all += loss_batch.item() * inputs.size(0)
-            outputs_mean = torch.cat(list_outputs, 0).mean(0)
-            outputs_var = torch.cat(list_outputs, 0).var(0)
             ## append
             self.list_inputs += list(inputs.cpu().detach().numpy())
             self.list_labels += labels.cpu().detach().numpy().tolist()
-            self.list_mean += outputs_mean.cpu().detach().numpy().tolist()
-            self.list_var += outputs_var.cpu().detach().numpy().tolist()
+            self.list_mean += np.array(list_outputs).mean(0).tolist()
+            for outputs in list(np.array(list_outputs).transpose(1, 0, 2)):
+                self.list_cov.append(np.cov(outputs, rowvar=False, bias=True))
         ## compute error
         mae, var, ave_std_dist, selected_mae, selected_var = self.computeAttitudeError()
         ## sort
@@ -98,7 +97,7 @@ class Inference(inference_mod.Inference):
         secs = (time.time() - start_clock) % 60
         print ("inference time: ", mins, " [min] ", secs, " [sec]")
         ## result
-        loss_all = loss_all / len(self.dataloader.dataset)
+        loss_all = loss_all / len(self.dataloader.dataset) / self.num_sampling
         print("Loss: {:.4f}".format(loss_all))
         print("mae [deg] = ", mae)
         print("var [deg^2] = ", var)
@@ -122,14 +121,13 @@ class Inference(inference_mod.Inference):
             error_p = self.computeAngleDiff(output_p, label_p)
             list_errors.append([error_r, error_p])
             ## std distance
-            std_dist = math.sqrt(self.list_var[i][0] + self.list_var[i][1] + self.list_var[i][2])
+            std_dist = math.sqrt(self.list_cov[i][0, 0] + self.list_cov[i][1, 1] + self.list_cov[i][2, 2])
             self.list_std_dist.append(std_dist)
-            print("std_dist = ", std_dist)
             ## register
             sample = Sample(
                 i,
                 self.dataloader.dataset.data_list[i][3:], self.list_inputs[i], self.list_labels[i],
-                self.list_mean[i], self.list_var[i], std_dist,
+                self.list_mean[i], self.list_cov[i], std_dist,
                 label_r, label_p, output_r, output_p, error_r, error_p
             )
             self.list_samples.append(sample)
