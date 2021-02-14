@@ -20,27 +20,27 @@ class Sample(inference_mod.Sample):
     def __init__(self,
             index,
             inputs_path, inputs, label,
-            mean, cov, std_dist,
+            mean, cov, mul_std,
             label_r, label_p, output_r, output_p, error_r, error_p):
         super(Sample, self).__init__(
             index,
             inputs_path, inputs, label, mean,
             label_r, label_p, output_r, output_p, error_r, error_p
         )
-        self.cov = cov              #ndarray
-        self.std_dist = std_dist    #float
+        self.cov = cov          #ndarray
+        self.mul_std = mul_std  #float
 
     def printData(self):
         super(Sample, self).printData()
         print("cov[m^2/s^4]: \n", self.cov)
-        print("std_dist[m/s^2]: ", self.std_dist)
+        print("mul_std[m^3/s^6]: ", self.mul_std)
 
 class Inference(inference_mod.Inference):
     def __init__(self,
             dataset,
             net, weights_path, criterion,
             batch_size,
-            num_mcsampling, th_std_dist):
+            num_mcsampling, th_mul_std):
         super(Inference, self).__init__(
             dataset,
             net, weights_path, criterion,
@@ -48,11 +48,11 @@ class Inference(inference_mod.Inference):
         )
         ## parameters
         self.num_mcsampling = num_mcsampling
-        self.th_std_dist = th_std_dist
+        self.th_mul_std = th_mul_std
         ## list
         self.list_selected_samples = []
         self.list_cov = []
-        self.list_std_dist = []
+        self.list_mul_std = []
         ## set
         self.enable_dropout()
 
@@ -85,7 +85,7 @@ class Inference(inference_mod.Inference):
             for outputs in list(np.array(list_outputs).transpose(1, 0, 2)):
                 self.list_cov.append(np.cov(outputs, rowvar=False, bias=True))
         ## compute error
-        mae, var, ave_std_dist, selected_mae, selected_var = self.computeAttitudeError()
+        mae, var, ave_mul_std, selected_mae, selected_var, weighted_mae = self.computeAttitudeError()
         ## sort
         self.sortSamples()
         ## show result & set graph
@@ -100,11 +100,12 @@ class Inference(inference_mod.Inference):
         print("Loss: {:.4f}".format(loss_all))
         print("mae [deg] = ", mae)
         print("var [deg^2] = ", var)
-        print("ave_std_dist [m/s^2] = ", ave_std_dist)
-        print("th_std_dist = ", self.th_std_dist)
+        print("ave_mul_std [m^3/s^6] = ", ave_mul_std)
+        print("th_mul_std = ", self.th_mul_std)
         print("#selected samples = ", len(self.list_selected_samples), " / ", len(self.list_samples))
         print("selected mae [deg] = ", selected_mae)
         print("selected var [deg^2] = ", selected_var)
+        print("weighted mae [deg] = ", weighted_mae)
         ## graph
         plt.tight_layout()
         plt.show()
@@ -120,37 +121,37 @@ class Inference(inference_mod.Inference):
             error_p = self.computeAngleDiff(output_p, label_p)
             list_errors.append([error_r, error_p])
             ## std distance
-            std_dist = math.sqrt(self.list_cov[i][0, 0] + self.list_cov[i][1, 1] + self.list_cov[i][2, 2])
-            self.list_std_dist.append(std_dist)
+            mul_std = math.sqrt(self.list_cov[i][0, 0]) * math.sqrt(self.list_cov[i][1, 1]) * math.sqrt(self.list_cov[i][2, 2])
+            # std_dist = math.sqrt(self.list_cov[i][0, 0] + self.list_cov[i][1, 1] + self.list_cov[i][2, 2])
+            self.list_mul_std.append(mul_std)
             ## register
             sample = Sample(
                 i,
                 self.dataloader.dataset.data_list[i][3:], self.list_inputs[i], self.list_labels[i],
-                self.list_est[i], self.list_cov[i], std_dist,
+                self.list_est[i], self.list_cov[i], mul_std,
                 label_r, label_p, output_r, output_p, error_r, error_p
             )
             self.list_samples.append(sample)
             ## judge
-            if std_dist < self.th_std_dist:
+            if mul_std < self.th_mul_std:
                 self.list_selected_samples.append(sample)
                 list_selected_errors.append([error_r, error_p])
-        arr_errors = np.array(list_errors)
-        arr_selected_errors = np.array(list_selected_errors)
-        print("arr_errors.shape = ", arr_errors.shape)
-        mae = self.computeMAE(arr_errors/math.pi*180.0)
-        var = self.computeVar(arr_errors/math.pi*180.0)
-        ave_std_dist = np.mean(self.list_std_dist, axis=0)
-        selected_mae = self.computeMAE(arr_selected_errors/math.pi*180.0)
-        selected_var = self.computeVar(arr_selected_errors/math.pi*180.0)
-        return mae, var, ave_std_dist, selected_mae, selected_var
+        mae = self.computeMAE(np.array(list_errors)/math.pi*180.0)
+        var = self.computeVar(np.array(list_errors)/math.pi*180.0)
+        ave_mul_std = np.mean(self.list_mul_std, axis=0)
+        selected_mae = self.computeMAE(np.array(list_selected_errors)/math.pi*180.0)
+        selected_var = self.computeVar(np.array(list_selected_errors)/math.pi*180.0)
+        list_weighted_error = list(np.array(list_errors)/math.pi*180.0 * (1/np.array(self.list_mul_std)[:, np.newaxis]))
+        weighted_mae = np.sum(np.abs(list_weighted_error), axis=0) / np.sum(1/np.array(self.list_mul_std))
+        return mae, var, ave_mul_std, selected_mae, selected_var, weighted_mae
 
     def sortSamples(self):  #overwrite
         list_sum_error_rp = [abs(sample.error_r) + abs(sample.error_p) for sample in self.list_samples]
         ## get indicies
         # sorted_indicies = np.argsort(list_sum_error_rp)         #error: small->large
         # sorted_indicies = np.argsort(list_sum_error_rp)[::-1]   #error: large->small
-        sorted_indicies = np.argsort(self.list_std_dist)        #sigma: small->large
-        # sorted_indicies = np.argsort(self.list_std_dist)[::-1]  #sigma: large->small
+        sorted_indicies = np.argsort(self.list_mul_std)        #sigma: small->large
+        # sorted_indicies = np.argsort(self.list_mul_std)[::-1]  #sigma: large->small
         ## sort
         self.list_samples = [self.list_samples[index] for index in sorted_indicies]
 
@@ -164,7 +165,7 @@ def main():
     batch_size = 10
     weights_path = "../../weights/regression.pth"
     num_mcsampling = 50
-    th_std_dist = 0.05
+    th_mul_std = 0.05
     ## dataset
     dataset = dataset_mod.OriginalDataset(
         data_list=make_datalist_mod.makeDataList(list_rootpath, csv_name),
@@ -184,7 +185,7 @@ def main():
         dataset,
         net, weights_path, criterion,
         batch_size,
-        num_mcsampling, th_std_dist
+        num_mcsampling, th_mul_std
     )
     inference.infer()
 

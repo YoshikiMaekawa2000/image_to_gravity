@@ -28,13 +28,13 @@ class Sample(inference_mod.Sample):
             inputs_path, inputs, label, mean,
             label_r, label_p, output_r, output_p, error_r, error_p
         )
-        self.cov = cov              #ndarray
-        self.mul_std = mul_std    #float
+        self.cov = cov          #ndarray
+        self.mul_std = mul_std  #float
 
     def printData(self):
         super(Sample, self).printData()
         print("cov[m^2/s^4]: \n", self.cov)
-        print("mul_std[m/s^2]: ", self.mul_std)
+        print("mul_std[m^3/s^6]: ", self.mul_std)
 
 class Inference(inference_mod.Inference):
     def __init__(self,
@@ -107,7 +107,7 @@ class Inference(inference_mod.Inference):
         print("Loss: {:.4f}".format(loss_all))
         print("mae [deg] = ", mae)
         print("var [deg^2] = ", var)
-        print("ave_mul_std [m/s^2] = ", ave_mul_std)
+        print("ave_mul_std [m^3/s^6] = ", ave_mul_std)
         print("th_mul_std = ", self.th_mul_std)
         print("#selected samples = ", len(self.list_selected_samples), " / ", len(self.list_samples))
         print("selected mae [deg] = ", selected_mae)
