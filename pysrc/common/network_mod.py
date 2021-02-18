@@ -3,22 +3,21 @@ from torchvision import models
 import torch.nn as nn
 
 class Network(nn.Module):
-    def __init__(self, resize, dim_fc_out=3, use_pretrained_vgg=True):
+    def __init__(self, resize, list_dim_fc_out=[100, 18, 3], dropout_rate=0.1, use_pretrained_vgg=True):
         super(Network, self).__init__()
 
         vgg = models.vgg16(pretrained=use_pretrained_vgg)
         self.cnn = vgg.features
 
         dim_fc_in = 512*(resize//32)*(resize//32)
-        self.fc = nn.Sequential(
-            nn.Linear(dim_fc_in, 100),
-            nn.ReLU(inplace=True),
-            nn.Dropout(p=0.1),
-            nn.Linear(100, 18),
-            nn.ReLU(inplace=True),
-            nn.Dropout(p=0.1),
-            nn.Linear(18, dim_fc_out)
-        )
+        list_dim_fc_in = [dim_fc_in] + list_dim_fc_out
+        list_fc = []
+        for i in range(len(list_dim_fc_in) - 1):
+            list_fc.append(nn.Linear(list_dim_fc_in[i], list_dim_fc_in[i+1]))
+            list_fc.append(nn.ReLU(inplace=True))
+            if i != len(list_dim_fc_in) - 2:
+                list_fc.append(nn.Dropout(p=dropout_rate))
+        self.fc = nn.Sequential(*list_fc)
         # self.initializeWeights()
 
     def initializeWeights(self):

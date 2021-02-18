@@ -165,7 +165,7 @@ def main():
     batch_size = 10
     weights_path = "../../weights/regression.pth"
     num_mcsampling = 50
-    th_mul_std = 0.05
+    th_mul_std = 0.001
     ## dataset
     dataset = dataset_mod.OriginalDataset(
         data_list=make_datalist_mod.makeDataList(list_rootpath, csv_name),
@@ -177,7 +177,7 @@ def main():
         phase="val"
     )
     ## network
-    net = network_mod.Network(resize, dim_fc_out=3, use_pretrained_vgg=False)
+    net = network_mod.Network(resize, list_dim_fc_out=[100, 18, 3], use_pretrained_vgg=False)
     ## criterion
     criterion = nn.MSELoss()
     ## infer

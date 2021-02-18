@@ -54,7 +54,7 @@ def main():
         phase="val"
     )
     ## network
-    net = network_mod.Network(resize, dim_fc_out=3, use_pretrained_vgg=True)
+    net = network_mod.Network(resize, list_dim_fc_out=[100, 18, 3], use_pretrained_vgg=True)
     ## criterion
     criterion = nn.MSELoss()
     ## train

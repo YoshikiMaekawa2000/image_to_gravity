@@ -184,7 +184,7 @@ def main():
         phase="val"
     )
     ## network
-    net = network_mod.Network(resize, dim_fc_out=9, use_pretrained_vgg=False)
+    net = network_mod.Network(resize, list_dim_fc_out=[100, 18, 9], use_pretrained_vgg=False)
     ## criterion
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     criterion = criterion_mod.Criterion(device)
