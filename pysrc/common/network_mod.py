@@ -14,8 +14,8 @@ class Network(nn.Module):
         list_fc = []
         for i in range(len(list_dim_fc_in) - 1):
             list_fc.append(nn.Linear(list_dim_fc_in[i], list_dim_fc_in[i+1]))
-            list_fc.append(nn.ReLU(inplace=True))
             if i != len(list_dim_fc_in) - 2:
+                list_fc.append(nn.ReLU(inplace=True))
                 list_fc.append(nn.Dropout(p=dropout_rate))
         self.fc = nn.Sequential(*list_fc)
         # self.initializeWeights()
