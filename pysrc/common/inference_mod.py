@@ -125,13 +125,13 @@ class Inference:
         list_errors_rp = []
         list_errors_g_angle = []
         for i in range(len(self.list_labels)):
-            ## error
+            ## error in roll and pitch
             label_r, label_p = self.accToRP(self.list_labels[i])
             output_r, output_p = self.accToRP(self.list_est[i])
             error_r = self.computeAngleDiff(output_r, label_r)
             error_p = self.computeAngleDiff(output_p, label_p)
             list_errors_rp.append([error_r, error_p])
-            ## error
+            ## error in angle of g
             error_g_angle = self.getAngleBetweenVectors(self.list_labels[i], self.list_est[i])
             list_errors_g_angle.append(error_g_angle)
             ## register
