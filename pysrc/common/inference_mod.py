@@ -120,14 +120,15 @@ class Inference:
         return loss
 
     def computeAttitudeError(self):
-        list_errors = []
+        list_errors_rp = []
+        list_errors_g_angle = []
         for i in range(len(self.list_labels)):
             ## error
             label_r, label_p = self.accToRP(self.list_labels[i])
             output_r, output_p = self.accToRP(self.list_est[i])
             error_r = self.computeAngleDiff(output_r, label_r)
             error_p = self.computeAngleDiff(output_p, label_p)
-            list_errors.append([error_r, error_p])
+            list_errors_rp.append([error_r, error_p])
             ## register
             sample = Sample(
                 i,
@@ -135,10 +136,10 @@ class Inference:
                 label_r, label_p, output_r, output_p, error_r, error_p
             )
             self.list_samples.append(sample)
-        arr_errors = np.array(list_errors)
-        print("arr_errors.shape = ", arr_errors.shape)
-        mae = self.computeMAE(arr_errors/math.pi*180.0)
-        var = self.computeVar(arr_errors/math.pi*180.0)
+        arr_errors_rp = np.array(list_errors_rp)
+        print("arr_errors_rp.shape = ", arr_errors_rp.shape)
+        mae = self.computeMAE(arr_errors_rp/math.pi*180.0)
+        var = self.computeVar(arr_errors_rp/math.pi*180.0)
         return mae, var
 
     def accToRP(self, acc):
