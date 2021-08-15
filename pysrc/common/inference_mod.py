@@ -141,12 +141,10 @@ class Inference:
                 label_r, label_p, output_r, output_p, error_r, error_p
             )
             self.list_samples.append(sample)
-        arr_errors_rp = np.array(list_errors_rp)
-        print("arr_errors_rp.shape = ", arr_errors_rp.shape)
-        mae_rp = self.computeMAE(arr_errors_rp/math.pi*180.0)
-        var_rp = self.computeVar(arr_errors_rp/math.pi*180.0)
-        mae_g_angle = self.computeMAE(list_errors_g_angle/math.pi*180.0)
-        var_g_angle = self.computeVar(list_errors_g_angle/math.pi*180.0)
+        mae_rp = self.computeMAE(np.array(list_errors_rp)/math.pi*180.0)
+        var_rp = self.computeVar(np.array(list_errors_rp)/math.pi*180.0)
+        mae_g_angle = self.computeMAE(np.array(list_errors_g_angle)/math.pi*180.0)
+        var_g_angle = self.computeVar(np.array(list_errors_g_angle)/math.pi*180.0)
         return mae_rp, var_rp, mae_g_angle, var_g_angle
 
     def accToRP(self, acc):
