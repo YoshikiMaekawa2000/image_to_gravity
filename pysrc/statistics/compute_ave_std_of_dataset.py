@@ -45,7 +45,7 @@ class StatisticsModel:
         diff = np.arctan2(np.sin(angle1 - angle2), np.cos(angle1 - angle2))
         return diff
 
-    def getAngleBetweenVectors(v1, v2):
+    def getAngleBetweenVectors(self, v1, v2):
         return math.acos(np.dot(v1, v2)/np.linalg.norm(v1, ord=2)/np.linalg.norm(v2, ord=2))
 
     def printError(self):
