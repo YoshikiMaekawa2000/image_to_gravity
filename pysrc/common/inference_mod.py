@@ -95,7 +95,7 @@ class Inference:
             self.list_labels += labels.cpu().detach().numpy().tolist()
             self.list_est += outputs.cpu().detach().numpy().tolist()
         ## compute error
-        mae, var = self.computeAttitudeError()
+        mae_rp, var_rp, mae_g_angle, var_g_angle = self.computeAttitudeError()
         ## sort
         self.sortSamples()
         ## show result & set graph
@@ -109,8 +109,10 @@ class Inference:
         loss_all = loss_all / len(self.dataloader.dataset)
         print("Loss: {:.4f}".format(loss_all))
         ## MAE & Var
-        print("mae [deg] = ", mae)
-        print("var [deg^2] = ", var)
+        print("mae_rp [deg] = ", mae_rp)
+        print("var_rp [deg^2] = ", var_rp)
+        print("mae_g_angle [deg] = ", mae_g_angle)
+        print("var_g_angle [deg^2] = ", var_g_angle)
         ## graph
         plt.tight_layout()
         plt.show()
@@ -120,14 +122,18 @@ class Inference:
         return loss
 
     def computeAttitudeError(self):
-        list_errors = []
+        list_errors_rp = []
+        list_errors_g_angle = []
         for i in range(len(self.list_labels)):
-            ## error
+            ## error in roll and pitch
             label_r, label_p = self.accToRP(self.list_labels[i])
             output_r, output_p = self.accToRP(self.list_est[i])
             error_r = self.computeAngleDiff(output_r, label_r)
             error_p = self.computeAngleDiff(output_p, label_p)
-            list_errors.append([error_r, error_p])
+            list_errors_rp.append([error_r, error_p])
+            ## error in angle of g
+            error_g_angle = self.getAngleBetweenVectors(self.list_labels[i], self.list_est[i])
+            list_errors_g_angle.append(error_g_angle)
             ## register
             sample = Sample(
                 i,
@@ -135,11 +141,11 @@ class Inference:
                 label_r, label_p, output_r, output_p, error_r, error_p
             )
             self.list_samples.append(sample)
-        arr_errors = np.array(list_errors)
-        print("arr_errors.shape = ", arr_errors.shape)
-        mae = self.computeMAE(arr_errors/math.pi*180.0)
-        var = self.computeVar(arr_errors/math.pi*180.0)
-        return mae, var
+        mae_rp = self.computeMAE(np.array(list_errors_rp)/math.pi*180.0)
+        var_rp = self.computeVar(np.array(list_errors_rp)/math.pi*180.0)
+        mae_g_angle = self.computeMAE(np.array(list_errors_g_angle)/math.pi*180.0)
+        var_g_angle = self.computeVar(np.array(list_errors_g_angle)/math.pi*180.0)
+        return mae_rp, var_rp, mae_g_angle, var_g_angle
 
     def accToRP(self, acc):
         r = math.atan2(acc[1], acc[2])
@@ -149,6 +155,9 @@ class Inference:
     def computeAngleDiff(self, angle1, angle2):
         diff = math.atan2(math.sin(angle1 - angle2), math.cos(angle1 - angle2))
         return diff
+
+    def getAngleBetweenVectors(self, v1, v2):
+        return math.acos(np.dot(v1, v2)/np.linalg.norm(v1, ord=2)/np.linalg.norm(v2, ord=2))
 
     def computeMAE(self, x):
         return np.mean(np.abs(x), axis=0)
