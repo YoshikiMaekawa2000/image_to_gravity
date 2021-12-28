@@ -43,8 +43,16 @@ $ python3 infer.py
 Preparing...
 ## Citation
 If this repository helps your research, please cite the paper below.  
-```
-Preparing...
+```TeX
+@ARTICLE{ozaki2021,
+	author = {Ryota Ozaki and Yoji Kuroda},
+	title = {EKF-based real-time self-attitude estimation with camera DNN learning landscape regularities},
+	journal = {IEEE Robotics and Automation Letters (RA-L)},
+	volume = {6},
+	number = {2},
+	pages = {1737--1744},
+	year = {2021}
+}
 ```
 The implementation used when it was published is available at Commit [2f66928](https://github.com/ozakiryota/image_to_gravity/tree/6ea94711b5ea6b7340856cf30a142b19d64b04d7).
 ## Related repositories
