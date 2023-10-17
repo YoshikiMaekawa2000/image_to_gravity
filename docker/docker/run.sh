@@ -4,7 +4,7 @@ image_name="image_to_gravity"
 tag_name="docker"
 root_path=$(pwd)
 
-xhost +
+#xhost +
 docker run -it --rm \
 	--gpus all \
 	--env="DISPLAY" \
