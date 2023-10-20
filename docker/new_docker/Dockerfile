@@ -1,7 +1,9 @@
-FROM nvidia/cuda:12.2.0-devel-ubuntu20.04
+FROM nvidia/cuda:11.1.1-cudnn8-runtime-ubuntu20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 ########## basis ##########
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
+RUN apt update
+RUN apt install -y --no-install-recommends \
     cmake \
     git \
     vim \
@@ -27,7 +29,6 @@ RUN apt-get update &&\
 		tensorboardX \
 		torch \
 		torchvision
-		# torch==1.2.0 torchvision==0.4.0
 ######### neovim install #########
 RUN cd /root/ && wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
 RUN cd /root/ && tar xzvf nvim-linux64.tar.gz
